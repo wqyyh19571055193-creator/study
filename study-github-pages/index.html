@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>机械原理学习台 · 在线机构实验室</title>
-<meta name="description" content="在线搭建平面机构，设置智能尺寸与复合铰链，按需计算运动和受力结果。">
-<meta name="theme-color" content="#151c29">
-<link rel="icon" href="./favicon.svg">
+<title>MECHLAB · 动态机械 CAD 工作台</title>
+<meta name="description" content="像 CAD 一样绘制机构草图，通过文字与坐标生成模型，计算运动与受力并导出中文数据报告。">
+<meta name="theme-color" content="#18232c">
+<link rel="icon" href="./assets/mech-mark.svg">
 <link rel="stylesheet" href="workbench.css">
 <style>
 :root{
@@ -171,43 +171,6 @@ button.tool.flash{background:var(--accent);border-color:var(--accent);color:#081
 /* 演示字幕画在画布顶部，此时把图例收起来，避免两块字叠在一起 */
 .canvas-wrap.demoing .legend{display:none}
 
-/* ---------- 考题演练 ---------- */
-#panel-exam{overflow-y:auto}
-.examwrap{max-width:1000px;margin:0 auto;padding:20px 18px 70px}
-.notice{background:#1a2233;border:1px solid #2f3f57;border-left:3px solid var(--accent2);
-  border-radius:8px;padding:10px 13px;margin:0 0 14px;color:var(--muted);font-size:12px;line-height:1.75}
-.notice b{color:var(--accent2)}
-.notice a{color:var(--accent)}
-.qcard{padding:0;overflow:hidden}
-.qhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
-  padding:11px 15px;background:var(--panel2);border-bottom:1px solid var(--line)}
-.qid{background:var(--accent);color:#08111c;font-weight:700;border-radius:5px;
-  padding:1px 7px;font-size:12px;flex:none}
-.qtitle{font-weight:600;font-size:13.5px}
-.qmeta{color:var(--muted);font-size:11.5px;margin-left:auto;white-space:nowrap}
-.qbody{padding:13px 15px}
-.qstem{font-size:13px;line-height:1.85;color:var(--fg)}
-.qstem code{font-size:12px}
-.qask{margin-top:11px;border-top:1px dashed var(--line);padding-top:10px}
-.qask .row{display:grid;grid-template-columns:1fr 130px 92px;gap:9px;align-items:center;
-  margin-bottom:6px}
-.qask .row label{color:var(--fg);font-size:12.5px}
-.qask .row .unit{color:var(--muted);font-size:11.5px}
-.verdict{font-size:12px;font-weight:600}
-.verdict.ok{color:var(--ok)}
-.verdict.bad{color:var(--warn)}
-.opt{display:flex;gap:8px;align-items:flex-start;margin:5px 0;font-size:12.5px;
-  color:var(--fg);cursor:pointer;line-height:1.7}
-.opt input{margin-top:4px;accent-color:var(--accent);flex:none}
-.qsol{margin-top:11px;border-top:1px solid var(--line);padding-top:11px;
-  font-size:12.5px;line-height:1.9;color:var(--muted)}
-.qsol b{color:var(--accent2)}
-.qsol .k{color:var(--fg)}
-.qsol ol,.qsol ul{margin:6px 0;padding-left:20px}
-.exambar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:10px 15px;
-  background:rgba(0,0,0,.14);border-top:1px solid var(--line)}
-.exambar .score{margin-left:auto;color:var(--muted);font-size:12px}
-
 /* ---------- 窄屏适配 ---------- */
 @media (max-width:1180px){
   .workbench{grid-template-columns:266px minmax(0,1fr)}
@@ -226,44 +189,26 @@ button.tool.flash{background:var(--accent);border-color:var(--accent);color:#081
 }
 </style>
 <link rel="stylesheet" href="web-adapter.css">
+<link rel="stylesheet" href="studio.css">
+<link rel="stylesheet" href="cad.css">
+<link rel="stylesheet" href="mechanical.css">
+<link rel="stylesheet" href="joints.css">
+<link rel="stylesheet" href="guide.css">
 </head>
 <body>
 <header>
-  <h1>机械原理学习台</h1>
+  <h1>机构 CAD 工作台</h1>
   <span class="sub">输入机构参数与受力条件 → 自动生成机构简图并完成运动 / 受力分析</span>
 </header>
 
 <nav>
-  <button data-tab="rig" class="active">机构搭建 / 通用受力分析</button>
-  <button data-tab="exam">考题演练</button>
-  <button data-tab="fourbar">平面四杆机构</button>
-  <button data-tab="cam">凸轮机构</button>
+  <button data-tab="rig" class="active">建模与计算</button>
+  <button data-tab="fourbar">四杆分析</button>
+  <button data-tab="cam">凸轮分析</button>
   <button data-tab="dof">自由度计算</button>
 </nav>
 
 <main>
-<!-- ==================== 考题演练 ==================== -->
-<section class="panel" id="panel-exam">
-  <div class="examwrap">
-    <div class="card">
-      <h2>考研题型演练 · 机械原理</h2>
-      <p class="lead">按机械原理课程的标准考点体系编写的原创模拟题：结构分析、运动分析、力分析、效率与自锁、连杆、凸轮、齿轮、轮系、速度波动、平衡、其他常用机构。数值题的参考答案全部由本页内置的求解器算出并交叉校核，可自动判题。</p>
-      <div class="notice">
-        <b>关于「院校真题」：</b>各校历年考研试题属于有版权的出版物内容，我无法提供也无法保证准确复现，因此这里的题目是<b>按同一考点体系原创编写</b>的同类题（题干、数据、问法均为新编），不是任何学校真题的原文。<br>
-        需要真题请走正规渠道：目标院校研究生院官网的招生专业目录与考试大纲、机械原理课程指定教材（如孙桓《机械原理》）的配套习题集、以及正规出版社的历年真题汇编。用本页题目练手，再拿真题检验，是更稳妥的路径。<br>
-        <b>题目是否同源不影响练习效果</b> —— 考点分布与解题步骤是一致的；而且这里每道题都能一键丢进求解器看动画、核答案。
-      </div>
-      <div class="btnrow" id="exam-filter"></div>
-      <div class="btnrow" style="margin-top:9px">
-        <button class="act" id="exam-reset">清空作答</button>
-        <button class="act" id="exam-expand">展开全部解析</button>
-        <span class="score" id="exam-score"></span>
-      </div>
-    </div>
-    <div id="exam-list"></div>
-  </div>
-</section>
-
 <!-- ==================== 通用机构搭建 / 分析 ==================== -->
 <section class="panel active" id="panel-rig">
   <div class="workbench">
@@ -336,7 +281,7 @@ button.tool.flash{background:var(--accent);border-color:var(--accent);color:#081
         </div>
         <div class="row" style="margin-top:6px"><label>循环进度 <span class="unit">%</span></label><input type="number" id="rig-phase" value="0" step="1" min="0" max="100"></div>
         <input type="range" id="rig-phase-range" min="0" max="100" step="0.2" value="0">
-        <div class="hint" id="rig-phase-note">从考题载入模型时会自动停在题目的位形上，读数与题目一致。</div>
+        <div class="hint" id="rig-phase-note">调整循环进度，可在指定时刻查看位形与计算结果。</div>
       </div>
 
       <div class="group">
@@ -745,7 +690,9 @@ button.tool.flash{background:var(--accent);border-color:var(--accent);color:#081
 </section>
 </main>
 
+<script src="joint-core.js"></script>
 <script>
+window.MechStudioState={lazySweep:true,analysis:false,readout:false,forces:false,sweepCount:0};
 'use strict';
 /* =========================================================================
    0. 通用数学与绘图基础
@@ -2387,6 +2334,8 @@ function rigLinSolve(A, b, n, m) {
 /** 把模型编译成「构件 + 约束行」结构。所有长度换算成米。 */
 function rigCompile(m) {
   rigNormModel(m);
+  const jointError=globalThis.MechJoints?.error(m);
+  if(jointError)return {ok:false,err:jointError};
   const P = m.points, L = m.links, S = MM;
   if (!L.length) return { ok: false, err: '还没有构件：先放铰点，再用「连构件」把它们连起来' };
 
@@ -2422,8 +2371,10 @@ function rigCompile(m) {
     bodies.push(all[i]);
   }
   const B = bodies.length, n = 3 * B;
-  const locOf = (bi, pi) => { const f = bodies[bi].loc.find(v => v.pi === pi); return f ? { x: f.x, y: f.y } : null; };
-  const bodyPts = bodies.map(bd => bd.pts);
+  const localPoints = bodies.map(bd => new Map(bd.loc.map(v => [v.pi, v])));
+  const locOf = (bi, pi) => { const f = localPoints[bi].get(pi); return f ? { x: f.x, y: f.y } : null; };
+  const pointOwners = P.map(() => []);
+  bodies.forEach((bd,bi) => { for(const pi of new Set(bd.pts)) pointOwners[pi].push(bi); });
 
   // 荷载不能加在机架杆上（会和机架固连，加了也读不出来）
   for (const ld of m.loads) {
@@ -2435,8 +2386,7 @@ function rigCompile(m) {
   const rows = [];
   const G = -1;
   for (let pi = 0; pi < P.length; pi++) {
-    const owners = [];
-    for (let bi = 0; bi < B; bi++) if (bodyPts[bi].includes(pi)) owners.push(bi);
+    const owners = pointOwners[pi];
     if (!owners.length) continue;              // 悬空点，或只属于机架杆的点，不产生约束
     if (P[pi].ground) {
       for (const bi of owners) {
@@ -2550,7 +2500,7 @@ function rigPrismIssues(m) {
       out.push(`${tag}：滑块的原点 P${ps[0] + 1} 是机架点——滑块原点被钉死在机架上，`
         + `这个移动副就退化成了 1 个多余约束（虚约束）。滑块要建在两个活动铰之间。`);
     }
-    if (pr.guide >= 0) {
+    if (pr.guide != null && pr.guide >= 0) {
       const gk = m.links[pr.guide];
       if (!gk || (gk.pts || []).length < 2) out.push(`${tag}：导轨构件要有至少 2 个铰点才能定方向。`);
       if (m.prisms.some((q, k) => k !== qi && q.link === pr.guide))
@@ -3023,14 +2973,16 @@ const RCOL = {
 /* 编辑期间用固定的比例尺与中心 —— 点击永远落在可见区内，画面绝不漂移。
    只有载入预设或点「适应窗口」时才重新取景。 */
 function rigFitView() {
-  const b = RIG.sweep && isFinite(RIG.sweep.box.x0) ? RIG.sweep.box : null;
+  const pts = RIG.model.points;
+  const bounds = pts.length ? {x0:Math.min(...pts.map(p=>p.x)),x1:Math.max(...pts.map(p=>p.x)),y0:Math.min(...pts.map(p=>p.y)),y1:Math.max(...pts.map(p=>p.y))} : null;
+  const b = RIG.sweep && isFinite(RIG.sweep.box.x0) ? RIG.sweep.box : bounds;
   if (!b) {
     RIG.editScale = 1.2;
     RIG.editCenter = { x: 0, y: 0 };
     return;
   }
   const w = Math.max(40, b.x1 - b.x0), h = Math.max(40, b.y1 - b.y0);
-  RIG.editScale = clampv(Math.min((rigMain.w - 96) / w, (rigMain.h - 96) / h), 0.12, 20);
+  RIG.editScale = clampv(Math.min((rigMain.w - 140) / w, (rigMain.h - 180) / h), 0.12, 20);
   RIG.editCenter = { x: (b.x0 + b.x1) / 2, y: (b.y0 + b.y1) / 2 };
 }
 function rigResetView() {
@@ -3062,6 +3014,7 @@ function rigDraw(sc) {
   sc.oy = sc.h / 2 + (RIG.editCenter ? RIG.editCenter.y : 0) * sc.scale;
   if (RIG.demo && RIG.demo.text) sc.oy += 26;      // 演示时顶部有字幕，整体下移一点
 
+  if(sc === rigMain && window.MechCAD) window.MechCAD.drawGrid(sc);
   const live = comp && sol && sol.ok;
   const P = i => live ? rigPointWorld(comp, sol, i) : { x: m.points[i].x, y: m.points[i].y };
 
@@ -3085,6 +3038,8 @@ function rigDraw(sc) {
       const d0 = Math.hypot(p1.x - p0.x, p1.y - p0.y) || 1;
       u = { x: (p1.x - p0.x) / d0, y: (p1.y - p0.y) / d0 };
     }
+    const nv={x:-u.y,y:u.x},half=110,pad=13/Math.max(sc.scale,.12);
+    for(const side of [-1,1]) sc.line(A.x-u.x*half+nv.x*pad*side,A.y-u.y*half+nv.y*pad*side,A.x+u.x*half+nv.x*pad*side,A.y+u.y*half+nv.y*pad*side,'rgba(111,185,225,.6)',2);
     const L = 600;
     sc.line(A.x - u.x * L * 0.2, A.y - u.y * L * 0.2,
       A.x + u.x * L, A.y + u.y * L, 'rgba(91,200,255,.35)', 1.2, [7, 5]);
@@ -3199,6 +3154,8 @@ function rigDraw(sc) {
     rigDrawNarration(sc);
     return;
   }
+
+  if(window.MechStudioState && !window.MechStudioState.forces){rigDrawNarration(sc);return;}
 
   // 惯性力矢量
   const prm = m;
@@ -3526,6 +3483,7 @@ function rigAddPoint(x, y, ground) {
 function rigToggleGround(pi, wantGround) {
   const p = RIG.model.points[pi];
   if (!p || !!p.ground === wantGround) return false;
+  const candidate=JSON.parse(JSON.stringify(RIG.model));candidate.points[pi].ground=wantGround;if(!rigJointCheck(candidate))return null;
   rigBackup();
   p.ground = wantGround;
   rigAfterEdit();
@@ -3622,9 +3580,12 @@ function rigZoom(f) {
 }
 
 /** 用两个铰点连成一根杆（「画杆」工具与拖拽手势共用）；第一根杆自动设为原动件 */
+function rigJointCheck(m){const e=globalThis.MechJoints?.error(m);if(!e)return true;$('rig-hint').textContent=e;const n=$('wb-notice');if(n)n.textContent=e;return false;}
 function rigMakeBar(from, to) {
   const m = RIG.model;
   if (from == null || to == null || from === to) return null;
+  const candidate=JSON.parse(JSON.stringify(m));candidate.links.push({pts:[from,to]});
+  if(!rigJointCheck(candidate))return null;
   rigBackup();
   m.links.push({ pts: [from, to], m: 1, J: 0.01 });
   if (m.drivers[0] && m.drivers[0].link < 0) m.drivers[0].link = m.links.length - 1;
@@ -3702,7 +3663,7 @@ function rigCanvasClick(ev) {
   if (t === 'pt' || t === 'pg') {
     const wantGround = t === 'pg';
     if (hit < 0) return rigAddPoint(w.x, w.y, wantGround);
-    if (!rigToggleGround(hit, wantGround)) {
+    if (rigToggleGround(hit, wantGround) === false) {
       RIG.selPts = [hit];
       rigDraw(rigMain);
       $('rig-hint').textContent = `P${hit + 1} 已经是${wantGround ? '固定铰支座' : '活动铰'}了。`;
@@ -3719,6 +3680,7 @@ function rigCanvasClick(ev) {
     return;
   }
   if (t === 'bar') {
+    if(RIG.barFrom!=null&&hit!==RIG.barFrom){const candidate=JSON.parse(JSON.stringify(m));let end=hit;if(end<0){end=candidate.points.length;candidate.points.push({x:w.x,y:w.y,ground:false});}candidate.links.push({pts:[RIG.barFrom,end]});if(!rigJointCheck(candidate))return;}
     let pi = hit;
     if (pi < 0) {                                  // 空白处自动新建铰点，边点边连
       rigBackup();
@@ -3741,7 +3703,7 @@ function rigCanvasClick(ev) {
     }
     const from = RIG.barFrom;
     RIG.barFrom = null;
-    rigMakeBar(from, pi);
+    if(rigMakeBar(from,pi)==null){if(hit<0&&pi===m.points.length-1&&!m.links.some(l=>l.pts.includes(pi)))m.points.pop();RIG.barFrom=from;rigRenderTables();rigDraw(rigMain);return;}
     rigSolve();
     $('rig-hint').textContent =
       `已连成 L${m.links.length}（P${from + 1}–P${pi + 1}）。接着画下一根：再点「起点 → 终点」两次即可`
@@ -3806,12 +3768,10 @@ function rigCanvasClick(ev) {
       const dd = Math.hypot(dx, dy);
       ux = dx / dd; uy = dy / dd;
     }
-    rigBackup();
-    // 轴心严格取滑块第 1 个铰点的当前坐标，保证 t=0 位形与输入几何一致
-    m.prisms.push({ link: sl, guide, ax: sp.x, ay: sp.y, dx: ux, dy: uy });
+    try {
+      MechWorkbench.commit(MechSupports.guide(m,[m.links[sl].id],Math.atan2(uy,ux)/DEG,guide<0?null:m.links[guide].id),'已设置移动副；重复操作更新原导轨。');
+    } catch(e) { $('rig-hint').textContent=e.message; return; }
     RIG.pending = null;
-    rigAfterEdit();
-    rigSolve();
     $('rig-hint').textContent = rigHintDiag(guide < 0
       ? '已加移动副（沿机架导轨）。可拖动虚线轴上的方块改方向、圆点改轴心。'
       : '已加移动副（随导轨构件）。');
@@ -4186,14 +4146,16 @@ function rigSolve() {
   if (dg.err) RIG.err = dg.err;
   const q0 = Float64Array.from(comp.bodies.flatMap(bd => [bd.x0, bd.y0, bd.th0]));
   RIG.q0 = q0;
-  const sw = rigSweep(comp, q0, 48);
+  const lazy = window.MechStudioState?.lazySweep;
+  const current = lazy ? rigAnalyze(comp, 0, q0) : null;
+  const sw = lazy ? null : rigSweep(comp, q0, 48);
   RIG.sweep = sw;
-  const first = sw.samples.find(s => s.ok) ;
+  const first = lazy ? (current.ok ? current : null) : sw.samples.find(s => s.ok);
   if (!first) {
     RIG.sol = { ok: false };
-    RIG.err = RIG.err || (sw.samples.find(s => s.err) || {}).err || '求解失败';
+    RIG.err = RIG.err || (lazy ? current.err : (sw.samples.find(s => s.err) || {}).err) || '求解失败';
   } else {
-    const r = rigAnalyze(comp, 0, q0);
+    const r = current || rigAnalyze(comp, 0, q0);
     RIG.sol = r.ok ? r : { ok: false };
     if (!r.ok) RIG.err = r.err;
   }
@@ -4320,6 +4282,7 @@ function renderRigReadout() {
    16. 事件绑定与初始化
    ========================================================================= */
 function rigLoadModel(m2) {
+  if(globalThis.MechJoints)m2=MechJoints.adoptLegacy(m2).model;
   rigNormModel(m2);
   RIG.model = m2;
   RIG.sol = null; RIG.sweep = null; RIG.q0 = null;
@@ -4587,8 +4550,8 @@ const RIG_DEMOS = [
         run: c => rigDemoAddPoint(c.P2.x, c.P2.y, false) },
       { tool: 'pt', text: '③ 第二个活动铰。',
         run: c => rigDemoAddPoint(c.P3.x, c.P3.y, false) },
-      { tool: 'link', text: '④ 连 P1–P2 得 L1；连 P1–P3 得 L2。P1 被两根杆共用 → 自动算成 2 个转动副（这就是复合铰链）。',
-        run: () => { rigDemoLink([0, 1]); rigDemoLink([0, 2]); } },
+      { tool: 'link', text: '④ 连 P1–P2 得 L1；连 P1–P3 得 L2。先在 P1 启用复合铰链，再接入两根杆；P1 连同机架对应 2 个转动副。',
+        run: () => { RIG.model.points[0].jointType="compound";rigDemoLink([0, 1]); rigDemoLink([0, 2]); } },
       { tool: 'erase', text: '⑤ 按 X 用「删除」点掉 P3：所属构件会一并清理，而且移动副 / 齿轮副 / 荷载 / 原动件里的索引都会自动重排。',
         run: () => { rigDeletePoint(2); } },
       { tool: 'select', text: '⑥ 也可以按 V 用「选择/拖动」点中铰点，再按 Delete 删除。',
@@ -4738,6 +4701,7 @@ function rigInit() {
   });
   $('rig-done').addEventListener('click', () => {
     if (RIG.selPts.length < 2) { $('rig-hint').textContent = '至少要点 2 个铰点。'; return; }
+    const candidate=JSON.parse(JSON.stringify(RIG.model));candidate.links.push({pts:RIG.selPts.slice()});if(!rigJointCheck(candidate))return;
     rigBackup();
     RIG.model.links.push({ pts: RIG.selPts.slice(), m: 1, J: 0.01 });
     if (RIG.model.driver.link < 0) RIG.model.driver.link = RIG.model.links.length - 1;
@@ -4810,7 +4774,7 @@ function rigInit() {
       RIG.model.points.push({ x: w2.x, y: w2.y, ground: false });
       RIG.barFrom = RIG.model.points.length - 1;
       bardrag = true;
-      RIG.skipClick = true;                      // 这次 mousedown 已经处理了，别再当成 click
+      RIG.skipClick = false;                     // 构图只在 mousedown 中处理，不跳过下一次端点点击
       rigRenderTables();
       $('rig-hint').textContent = '拖到终点松手即成杆；也可以松手后再点第二个铰点。';
       rigDraw(rigMain);
@@ -4872,9 +4836,9 @@ function rigInit() {
     if (bardrag) {
       bardrag = false;
       const from = RIG.barFrom;
-      RIG.barFrom = null;
       if (from == null) { rigDraw(rigMain); return; }
       const w = rigToWorld(e);
+      RIG.barFrom = null;
       let pi = rigHitPoint(e);
       if (pi === from) pi = -1;
       if (pi < 0) {
@@ -4887,7 +4851,7 @@ function rigInit() {
         RIG.model.points.push({ x: w.x, y: w.y, ground: false });
         pi = RIG.model.points.length - 1;
       }
-      rigMakeBar(from, pi);
+      if(rigMakeBar(from,pi)==null){if(pi===RIG.model.points.length-1&&!RIG.model.links.some(l=>l.pts.includes(pi)))RIG.model.points.pop();RIG.barFrom=from;rigRenderTables();rigDraw(rigMain);return;}
       rigRenderTables();
       rigSolve();
       $('rig-hint').textContent =
@@ -4915,6 +4879,7 @@ function rigInit() {
     const tag = (e.target.tagName || '').toUpperCase();
     const typing = tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || e.target.isContentEditable;
     const k = e.key;
+    if(typing && k !== 'Escape') return;
     if ((e.ctrlKey || e.metaKey) && (k === 'z' || k === 'Z')) {
       e.preventDefault(); $('rig-undo').click(); return;
     }
@@ -5047,19 +5012,11 @@ function rigInit() {
     const gv = +$('rig-pr-guide').value;
     if (gv === sl) { $('rig-hint').textContent = '滑块与导轨不能是同一个构件。'; return; }
     const guide = (gv >= 0 && gv < m.links.length) ? gv : -1;
-    let ux = 1, uy = 0;
-    if (guide >= 0) {
-      const gk = m.links[guide], p0 = m.points[gk.pts[0]], p1 = m.points[gk.pts[1]];
-      const dd = Math.hypot(p1.x - p0.x, p1.y - p0.y) || 1;
-      ux = (p1.x - p0.x) / dd; uy = (p1.y - p0.y) / dd;
-    } else {
-      const a = (parseFloat($('rig-pr-ang').value) || 0) * DEG;
-      ux = Math.cos(a); uy = Math.sin(a);
-    }
-    const sp = m.points[m.links[sl].pts[0]];
-    rigBackup();
-    m.prisms.push({ link: sl, guide, ax: sp.x, ay: sp.y, dx: ux, dy: uy });
-    rigAfterEdit(); rigSolve();
+    const angle=guide<0?Number($('rig-pr-ang').value):0;
+    if(guide<0&&(!$('rig-pr-ang').value.trim()||!Number.isFinite(angle))){$('rig-hint').textContent='请输入有效的导轨角度。';return;}
+    try {
+      MechWorkbench.commit(MechSupports.guide(m,[m.links[sl].id],angle,guide<0?null:m.links[guide].id),'已设置移动副；重复操作更新原导轨。');
+    } catch(e) { $('rig-hint').textContent=e.message; return; }
     $('rig-hint').textContent = rigHintDiag(
       `已给 L${sl + 1} 加移动副，导轨 = ${rigLinkName(guide)}。`
       + (guide < 0 ? '（可直接拖动画布上虚线轴的方块改方向）' : ''));
@@ -5275,730 +5232,29 @@ function rigMainLoop() {
   requestAnimationFrame(step);
 }
 
-/* =========================================================================
-   17. 考题演练（原创模拟题；答案均由本页求解器算出并校核）
-   ========================================================================= */
-const EXAM = [
-{
-  id: 'T1', ch: '结构分析', score: 10, diff: 2,
-  title: '含复合铰链的机构自由度计算',
-  stem: `某平面机构由 <code>5</code> 个活动构件组成。其中有一处为 <code>3</code> 个构件共同铰接（即复合铰链），
-    另有 <code>4</code> 处为两构件铰接的单一转动副，还有 <code>1</code> 个移动副。无高副，也不存在局部自由度与虚约束。`,
-  asks: [
-    { label: '低副总数 P<sub>L</sub>', unit: '', value: 7, tol: 1e-6 },
-    { label: '机构自由度 F', unit: '', value: 1, tol: 1e-6 },
-  ],
-  sol: `<b>复合铰链算法</b>：m 个构件在同一处以转动副相连时，该处的实际低副数为 (m − 1)。
-    <ol>
-      <li>3 个构件汇交处 → <span class="k">3 − 1 = 2</span> 个低副</li>
-      <li>低副总数 <span class="k">P<sub>L</sub> = 2 + 4 + 1 = 7</span></li>
-      <li><span class="k">F = 3n − 2P<sub>L</sub> − P<sub>H</sub> = 3×5 − 2×7 − 0 = 1</span></li>
-    </ol>
-    <b>易错点</b>：把三构件汇交处只数 1 个转动副，会得到 F = 3×5 − 2×6 = 3，直接错。
-    另一种错法是漏掉移动副。<br>
-    想验证就把机构搭出来：点左栏「机构搭建」页，程序会按拓扑自动数出
-    <span class="k">广义坐标 15 · 约束 15 · 自由度 1</span>，与手算完全一致。`,
-  rig: () => {
-    const b = rigBuilder();
-    const p1 = b.P(0, 0, true), p2 = b.P(40, 60), p3 = b.P(140, 40),
-      p4 = b.P(180, -60, true), p5 = b.P(200, -20), p6 = b.P(250, -20);
-    const l1 = b.L([p1, p2], 2, 0.01);
-    b.L([p2, p3], 3, 0.03); b.L([p3, p4], 4, 0.06); b.L([p3, p5], 2, 0.02);
-    const l5 = b.L([p5, p6], 5, 0.05);
-    b.PR(l5, null, 1, 0);
-    return { points: b.pts, links: b.links, prisms: b.prisms, gears: [], loads: [],
-      driver: { link: l1, type: 'rot', n: 60, v: 0 },
-      useGravity: false, useInertia: false, useFriction: false, f: 0.1, rj: 8 };
-  },
-},
-{
-  id: 'T2', ch: '结构分析', score: 8, diff: 2,
-  title: '局部自由度与虚约束的辨析',
-  kind: 'choice',
-  stem: `关于平面机构自由度计算，下列说法正确的是（　　）` ,
-  options: [
-    '滚子从动件凸轮机构中，滚子引入局部自由度，必须把滚子"焊死"才能算出正确结果，否则自由度一定偏大',
-    '机构中对传递运动不起独立限制作用的约束称为虚约束，计算自由度时应先去掉虚约束再数 n、P<sub>L</sub>、P<sub>H</sub>',
-    '虚约束越多，机构自由度越小，所以虚约束只会使 F 偏小',
-    '复合铰链处 m 个构件汇交，应计为 m 个转动副',
-  ],
-  correct: 1,
-  sol: `<b>逐项辨析：</b>
-    <ul>
-      <li><span class="k">A 错。</span>「焊死」只是常用做法之一。若照数，滚子 <b>+1 构件 (+3)</b>、
-        销轴 <b>+1 低副 (−2)</b>、滚子与凸轮接触 <b>+1 高副 (−1)</b>，净增 <b>0</b>，结果不变。
-        关键在<b>三样都要数到</b>；只数滚子而不数销轴与高副，才会偏大。所以说"一定偏大"是错的。</li>
-      <li><span class="k">B 对。</span>这是虚约束的定义与正确处理方法。</li>
-      <li><span class="k">C 错。</span>虚约束使算出的 F 偏小，但它的影响是"虚假的"——
-        去掉后 F 才是机构的真实自由度（等于原动件数）。说"只会使 F 偏小"是把虚约束的效果与
-        "机构真实自由度小"混为一谈；而且虚约束本质上不改变机构实际运动。</li>
-      <li><span class="k">D 错。</span>应为 (m − 1) 个转动副（复合铰链）。</li>
-    </ul>
-    <b>四种常见虚约束来源</b>：① 两构件在多处用转动副相连且轴线重合；
-    ② 两构件在多处组成移动副且导路平行；③ 对传递运动不起作用的对称部分（如对称布置的行星轮）；
-    ④ 连接点轨迹与另一构件上点的轨迹重合（如椭圆仪机构的附加杆）。`,
-},
-{
-  id: 'T3', ch: '连杆机构', score: 15, diff: 2,
-  title: '曲柄摇杆机构：最小传动角、极位夹角与行程速比系数',
-  stem: `铰链四杆机构中，<code>AB = a = 25 mm</code>（曲柄），<code>BC = b = 60 mm</code>（连杆），
-    <code>CD = c = 55 mm</code>（摇杆），<code>AD = d = 80 mm</code>（机架，A、D 为固定铰）。
-    以曲柄 AB 为原动件，曲柄顺时针匀速转动。<br>
-    试求：(1) 该机构的类型；(2) 最小传动角 γ<sub>min</sub>；(3) 极位夹角 θ；(4) 行程速比系数 K。`,
-  asks: [
-    { label: '最小传动角 γ<sub>min</sub>', unit: '°', value: 48.1897, tol: 0.02 },
-    { label: '极位夹角 θ', unit: '°', value: 4.0213, tol: 0.02 },
-    { label: '行程速比系数 K', unit: '', value: 1.0457, tol: 0.002 },
-  ],
-  sol: `<b>(1) 类型判定</b>（格拉肖夫条件）<br>
-    最短杆 + 最长杆 ≤ 其余两杆之和：<span class="k">25 + 80 = 105 ≤ 60 + 55 = 115</span>，满足。<br>
-    最短杆是 AB，且与机架 AD 相邻 → <span class="k">曲柄摇杆机构</span>。<br><br>
-    <b>(2) 最小传动角</b>：γ 为连杆与摇杆在 C 点所夹的锐角（即 D 点处）。γ<sub>min</sub> 出现在曲柄与机架共线处，
-    取 <code>φ₂ = 0°</code> 与 <code>φ₂ = 180°</code> 两种位形中较小的那个。
-    本例 γ<sub>min</sub> = <span class="k">48.19°</span>（出现在 φ₂ = 180°）。<br>
-    γ<sub>min</sub> ≥ 40° 通常可接受。<br><br>
-    <b>(3)(4) 急回特性</b>：摇杆处于极限位置时曲柄与连杆共线。
-    利用几何关系 <code>AC₁ = a + b = 85</code>、<code>AC₂ = b − a = 35</code>，
-    在三角形 ADC 中用余弦定理求出两个极限位置的曲柄转角，
-    得 θ = <span class="k">4.02°</span>；<br>
-    <code>K = (180° + θ)/(180° − θ) = 184.02/175.98</code> = <span class="k">1.046</span>。<br>
-    K 很接近 1，说明这个机构的急回特性很弱（因为 θ 很小）。`,
-  rig: () => examCrankRocker(25, 60, 55, 80),
-},
-{
-  id: 'T4', ch: '连杆机构', score: 15, diff: 3,
-  title: '按行程速比系数设计曲柄摇杆机构',
-  stem: `设计一铰链四杆机构：已知摇杆长度 <code>c = 100 mm</code>，摇杆摆角 <code>ψ = 30°</code>，
-    行程速比系数 <code>K = 1.2</code>，机架长度 <code>d = 120 mm</code>。求曲柄长度 a 与连杆长度 b。`,
-  asks: [
-    { label: '曲柄长度 a', unit: 'mm', value: 25.0111, tol: 0.15 },
-    { label: '连杆长度 b', unit: 'mm', value: 53.0433, tol: 0.2 },
-  ],
-  sol: `<b>设计思路（作图法 → 解析式）</b>
-    <ol>
-      <li>由 K 求极位夹角：<code>θ = 180°(K − 1)/(K + 1) = 180°×0.2/2.2</code> = <span class="k">16.36°</span></li>
-      <li>以 D 为圆心、c 为半径画出摇杆两极限位置 C₁、C₂，使 ∠C₁DC₂ = ψ = 30°。
-        两极限位置的角平分线方向角 β 待定。</li>
-      <li>固定铰 A 在距 D 为 d 处。两极限位置的<b>弦</b> C₁C₂ 对 A 张成的角必须等于 θ
-        （因为 A 必须落在过 C₁、C₂ 且圆周角为 θ 的圆弧上）。由此定出 β。</li>
-      <li>极限位置时曲柄与连杆共线，故 <code>AC₁ = a + b</code>、<code>AC₂ = b − a</code>，
-        于是 <code>a = (AC₁ − AC₂)/2</code>、<code>b = (AC₁ + AC₂)/2</code>。</li>
-    </ol>
-    算得 <code>β = 25.29°</code>，<code>AC₁ = 78.05 mm</code>，<code>AC₂ = 28.03 mm</code>，<br>
-    故 <span class="k">a = 25.01 mm</span>，<span class="k">b = 53.04 mm</span>。<br>
-    <b>回代校核</b>：用这组尺寸反算极位夹角，得到 θ = 16.36°、K = 1.200，与设计要求完全一致 ✔<br>
-    <b>校验装配条件</b>：最短杆 a = 25.01 与最长杆 d = 120 之和 145.01，其余两杆之和 153.04，
-    满足格拉肖夫条件且最短杆为连架杆 → 确实是曲柄摇杆机构 ✔`,
-  rig: () => examCrankRocker(25.0111, 53.0433, 100, 120),
-},
-{
-  id: 'T5', ch: '运动分析', score: 12, diff: 2,
-  title: '瞬心法求四杆机构各构件角速度',
-  stem: `铰链四杆机构 <code>AB = 30 mm</code>、<code>BC = 90 mm</code>、<code>CD = 70 mm</code>、<code>AD = 100 mm</code>。
-    当曲柄转角 <code>φ₂ = 60°</code> 时，曲柄角速度 <code>ω₂ = 10 rad/s</code>（逆时针）。
-    用速度瞬心法求连杆与摇杆的角速度 ω₃、ω₄。`,
-  asks: [
-    { label: '连杆角速度 ω₃', unit: 'rad/s', value: -2.101039, tol: 0.01 },
-    { label: '摇杆角速度 ω₄', unit: 'rad/s', value: 2.408837, tol: 0.01 },
-  ],
-  sol: `<b>瞬心法要点</b>：机构有 4 个构件（含机架），瞬心总数 <code>N = k(k−1)/2 = 6</code>。
-    直接观察可得 P₁₂（A）、P₂₃（B）、P₃₄（C）、P₁₄（D）；再用三心定理求 P₁₃ 与 <b>P₂₄</b>。<br><br>
-    <b>求 ω₄ 用 P₂₄</b>：P₂₄ 是构件 2 与 4 的绝对瞬心（即瞬时重合点）。
-    对构件 2：<code>v<sub>P24</sub> = ω₂ · AP₂₄</code>；对构件 4：<code>v<sub>P24</sub> = ω₄ · DP₂₄</code>。
-    两式相等 → <code>ω₄ / ω₂ = AP₂₄ / DP₂₄</code>。<br><br>
-    本例 <code>AP₂₄ = |ω₂·a / ω₄| = 10×30/2.4088</code> ≈ <span class="k">124.54 mm</span>。<br>
-    求得的 <span class="k">ω₄ = 2.409 rad/s</span>（与 ω₂ 同向，逆时针）。<br><br>
-    <b>求 ω₃ 用 P₁₃</b>：同理 <code>ω₃ / ω₂ = AP₁₃ / BP₁₃</code>，得
-    <span class="k">ω₃ = −2.101 rad/s</span>，负号表示与 ω₂ <b>反向</b>（顺时针）。<br><br>
-    <b>易错点</b>：瞬心法只需求出 2 个关键瞬心的位置，比值即为角速度比；
-    但 <b>方向</b>必须靠判断，不能只写数值。另外要注意绝对瞬心（相对机架）与相对瞬心的区别。`,
-  rig: () => examCrankRocker(30, 90, 70, 100, 60, 10 * 60 / (2 * Math.PI)),
-},
-{
-  id: 'T6', ch: '运动分析', score: 12, diff: 2,
-  title: '对心曲柄滑块机构：位移、速度与传力性能',
-  stem: `对心曲柄滑块机构，曲柄长 <code>r = 60 mm</code>，连杆长 <code>l = 180 mm</code>，
-    曲柄转速 <code>n = 90 r/min</code>（逆时针）。
-    当曲柄自与导路重合的位置转过 <code>φ = 45°</code> 时，
-    求 (1) 滑块的位移 x（自内止点起算）；(2) 滑块速度 v；(3) 最大压力角 α<sub>max</sub>；(4) 最小传动角 γ<sub>min</sub>。`,
-  asks: [
-    { label: '滑块位移 x', unit: 'mm', value: 217.3550, tol: 0.02 },
-    { label: '滑块速度 v', unit: 'mm/s', value: -496.8396, tol: 0.05 },
-    { label: '最大压力角 α<sub>max</sub>', unit: '°', value: 19.4712, tol: 0.02 },
-    { label: '最小传动角 γ<sub>min</sub>', unit: '°', value: 70.5288, tol: 0.02 },
-  ],
-  sol: `<b>角速度</b>：<code>ω = 2πn/60 = 2π×90/60</code> = <span class="k">9.4248 rad/s</span><br><br>
-    <b>(1) 位移</b>：<code>x = r·cosφ + √(l² − r²sin²φ)</code><br>
-    <code>= 60×0.70711 + √(180² − 60²×0.5) = 42.43 + √30600</code> = <span class="k">217.355 mm</span><br>
-    （若按"自内止点起算"的行程表示，可写 x − (l − r)；本题按上式取绝对值坐标。）<br><br>
-    <b>(2) 速度</b>：<code>v = −rω·sinφ − r²ω·sinφcosφ / √(l² − r²sin²φ)</code><br>
-    <code>= −60×9.4248×0.70711 − 3600×9.4248×0.5/174.93</code><br>
-    <code>= −400.00 − 96.84</code> = <span class="k">−496.84 mm/s</span>
-    （负号表示滑块向左运动，速率 496.84 mm/s）<br><br>
-    <b>(3)(4) 传力性能</b>：压力角 α 是<b>连杆（传力方向）</b>与<b>滑块速度方向（沿导路）</b>的夹角，
-    也就是连杆的倾角；传动角 γ = 90° − α。<br>
-    α 在曲柄与导路<b>垂直</b>时取最大，此时 <code>sinα<sub>max</sub> = r/l</code>，<br>
-    故 <span class="k">α<sub>max</sub> = arcsin(60/180) = 19.47°</span>，
-    <span class="k">γ<sub>min</sub> = 90° − 19.47° = 70.53°</span>。<br><br>
-    <b>易错点</b>：不要把压力角与传动角写反 —— α 是"力与速度"的夹角，γ = 90° − α。
-    对心曲柄滑块的 γ<sub>min</sub> 通常很大，传力性能好；这正是对心式的优点之一。`,
-  rig: () => examSliderCrank(60, 180, 0, 45, 90),
-},
-{
-  id: 'T7', ch: '力分析', score: 15, diff: 3,
-  title: '曲柄摇杆机构的动态静力分析',
-  stem: `铰链四杆机构 <code>AB = 30 mm</code>、<code>BC = 90 mm</code>、<code>CD = 70 mm</code>、<code>AD = 100 mm</code>，
-    曲柄以 <code>n = 60 r/min</code> 匀速转动。摇杆 CD 上作用一<b>顺时针的力偶</b> <code>M<sub>c</sub> = 5 N·m</code>（工作阻力矩）。
-    转速很低，<b>忽略惯性力与重力</b>。<br>
-    当曲柄处于 <code>φ₂ = 60°</code> 时，求 (1) 各转动副反力的大小；(2) 曲柄上所需的驱动力矩 M<sub>d</sub>。`,
-  asks: [
-    { label: '各转动副反力 |R|', unit: 'N', value: 78.113346, tol: 0.05 },
-    { label: '曲柄驱动力矩 M<sub>d</sub>', unit: 'N·m', value: 1.204419, tol: 0.005 },
-  ],
-  sol: `<b>为什么四个反力大小相同？</b><br>
-    连杆 BC 和摇杆 CD 上都没有外力（不计重力、无惯性力），因此它们都是<b>二力构件</b>，
-    两端反力必沿杆轴线、大小相等方向相反。于是 B、C 处反力垂直于各自的杆，
-    而这两个反力又必须构成平衡力系 → 整个力系沿一条直线传递，
-    最终 A、D 两处的反力大小也相等，全部为 <span class="k">|R| = 78.11 N</span>。<br><br>
-    <b>求解步骤（课本格式）</b>
-    <ol>
-      <li>以摇杆 CD 为研究对象：ΣM<sub>D</sub> = 0 →
-        <code>|R<sub>C</sub>|·(C 到 D 的垂直距离) = M<sub>c</sub></code>，
-        解出 <code>|R<sub>C</sub>| = 78.11 N</code>，方向垂直于 CD。</li>
-      <li>摇杆为二力构件 → <code>|R<sub>D</sub>| = |R<sub>C</sub>| = 78.11 N</code>。</li>
-      <li>连杆 BC 也是二力构件 → <code>|R<sub>B</sub>| = |R<sub>C</sub>| = 78.11 N</code>。</li>
-      <li>对曲柄 AB：ΣF = 0 → <code>|R<sub>A</sub>| = |R<sub>B</sub>| = 78.11 N</code>；
-        ΣM<sub>A</sub> = 0 → <code>M<sub>d</sub> = R<sub>B</sub>·(力臂)</code> = <span class="k">1.2044 N·m</span>。</li>
-    </ol>
-    <b>能量校核</b>：<code>M<sub>d</sub>·ω₂ + M<sub>c</sub>·ω₄ = 1.2044×6.2832 + (−5)×1.5135 = 0</code> ✔ 功率完全平衡。<br>
-    <b>易错点</b>：① 忘记二力构件的判断，白算了 9 个方程；
-    ② 力偶的方向（顺时针/逆时针）直接决定 M<sub>d</sub> 的正负。`,
-  rig: () => {
-    const m = examCrankRocker(30, 90, 70, 100);
-    m.loads = [{ link: 2, kind: 'M', m: -5 }];
-    m.useInertia = false; m.useGravity = false;
-    return m;
-  },
-},
-{
-  id: 'T8', ch: '效率与自锁', score: 12, diff: 2,
-  title: '螺旋千斤顶的升角、当量摩擦角、自锁与效率',
-  stem: `一螺旋千斤顶采用梯形螺纹，螺纹中径 <code>d₂ = 24 mm</code>，单线、螺距 <code>P = 6 mm</code>，
-    螺旋副摩擦系数 <code>f = 0.15</code>，牙型半角 <code>β/2 = 15°</code>。<br>
-    求 (1) 螺纹升角 α；(2) 当量摩擦角 φ<sub>v</sub>；(3) 该螺旋副能否自锁；(4) 拧紧时的效率 η。`,
-  asks: [
-    { label: '螺纹升角 α', unit: '°', value: 4.5499, tol: 0.02 },
-    { label: '当量摩擦角 φ<sub>v</sub>', unit: '°', value: 8.8270, tol: 0.03 },
-    { label: '拧紧效率 η', unit: '%', value: 33.4630, tol: 0.3 },
-  ],
-  correctText: '自锁',
-  sol: `<b>(1) 升角</b>：单线螺纹导程 <code>l = P = 6 mm</code>，<br>
-    <code>α = arctan(l / (π·d₂)) = arctan(6 / 75.398)</code> = <span class="k">4.550°</span><br><br>
-    <b>(2) 当量摩擦角</b>（梯形螺纹需折算牙型角）：<br>
-    <code>f<sub>v</sub> = f / cos(β/2) = 0.15 / cos15° = 0.15529</code>，<br>
-    <code>φ<sub>v</sub> = arctan(0.15529)</code> = <span class="k">8.827°</span><br><br>
-    <b>(3) 自锁条件</b>：<code>α ≤ φ<sub>v</sub></code>。<br>
-    本例 4.550° &lt; 8.827° → <span class="k">能自锁 ✔</span>（松手后重物不会自行下落，这正是千斤顶的必要条件）<br><br>
-    <b>(4) 拧紧效率</b>：<code>η = tanα / tan(α + φ<sub>v</sub>)</code><br>
-    <code>= tan4.550° / tan13.377° = 0.079577 / 0.23780</code> = <span class="k">33.46%</span><br><br>
-    <b>结论</b>：自锁与高效率是矛盾的 —— 自锁要求 α 小（α ≤ φ<sub>v</sub>），
-    而 η 随 α 增大而提高，α = 45° − φ<sub>v</sub>/2 时效率最高。
-    千斤顶牺牲效率换取自锁，所以 η 只有 1/3 左右。<br>
-    <b>注意</b>：矩形螺纹取 f<sub>v</sub> = f；梯形/三角形螺纹必须除以 cos(β/2)，别漏。`,
-},
-{
-  id: 'T9', ch: '凸轮机构', score: 15, diff: 2,
-  title: '尖顶直动从动件凸轮：推程中点的运动学与压力角',
-  stem: `一尖顶直动从动件盘形凸轮机构，基圆半径 <code>r<sub>b</sub> = 40 mm</code>，无偏距。
-    从动件推程按<b>余弦加速度（简谐）运动规律</b>，升程 <code>h = 25 mm</code>，推程角 <code>δ₁ = 90°</code>。
-    凸轮以 <code>n = 300 r/min</code> 逆时针匀速转动。<br>
-    求推程中点（<code>δ = 45°</code>）处从动件的 (1) 位移 s；(2) 速度 v；(3) 加速度 a；(4) 压力角 α。`,
-  asks: [
-    { label: '位移 s', unit: 'mm', value: 12.5, tol: 0.02 },
-    { label: '速度 v', unit: 'mm/s', value: 785.3982, tol: 1.0 },
-    { label: '加速度 a', unit: 'mm/s²', value: 0, tol: 0.5 },
-    { label: '压力角 α', unit: '°', value: 25.4633, tol: 0.05 },
-  ],
-  sol: `<b>角速度</b>：<code>ω = 2π×300/60</code> = <span class="k">31.4159 rad/s</span><br><br>
-    <b>余弦加速度规律</b>（半径 u = δ/δ₁ = 45/90 = 0.5）：<br>
-    <code>s = (h/2)(1 − cos(πu))</code> = (25/2)(1 − cos90°) = <span class="k">12.5 mm</span><br>
-    <code>ds/dδ = (hπ/2δ₁)·sin(πu)</code> = (25×π/2)/(π/2) × 1 = <span class="k">25 mm/rad</span><br>
-    <code>d²s/dδ² = (hπ²/2δ₁²)·cos(πu)</code>，因 cos90° = 0 → <span class="k">加速度 a = 0</span><br><br>
-    <b>速度</b>：<code>v = (ds/dδ)·ω = 25 × 31.4159</code> = <span class="k">785.40 mm/s</span><br><br>
-    <b>(4) 压力角</b>：无偏距，<code>s₀ = √(r<sub>b</sub>² − e²) = r<sub>b</sub> = 40 mm</code><br>
-    <code>tanα = |ds/dδ − e| / (s₀ + s) = 25 / (40 + 12.5) = 0.47619</code><br>
-    → <span class="k">α = 25.46°</span><br><br>
-    <b>物理意义</b>：推程中点恰好是余弦加速度规律的<b>速度最大、加速度为零</b>的点
-    （所以 a 为零不是算错）。这也是简谐运动规律的特征：中点为速度峰值点。<br>
-    <b>易错点</b>：ds/dδ 的单位是 mm/rad，与 ω（rad/s）相乘才得 mm/s；
-    直接用 δ 的角度值求导会差 57.3 倍。`,
-  rig: false,
-},
-{
-  id: 'T10', ch: '凸轮机构', score: 12, diff: 3,
-  title: '按许用压力角确定最小基圆半径',
-  stem: `一尖顶直动从动件盘形凸轮机构，无偏距。推程按余弦加速度运动规律，
-    升程 <code>h = 20 mm</code>，推程角 <code>δ₁ = 120°</code>；回程亦为余弦加速度，<code>δ₃ = 120°</code>，无远休止角。
-    许用压力角 <code>[α] = 30°</code>。<br>
-    求满足压力角条件的最小基圆半径 <code>r<sub>b,min</sub></code>。`,
-  asks: [
-    { label: '最小基圆半径 r<sub>b,min</sub>', unit: 'mm', value: 17.8388, tol: 0.15 },
-  ],
-  sol: `<b>条件</b>：推程各处需满足<br>
-    <code>tanα = |ds/dδ| / (s₀ + s) ≤ tan[α]</code>，其中 <code>s₀ = r<sub>b</sub></code>（无偏距）。<br><br>
-    反解出对基圆半径的要求：<br>
-    <code>s₀ ≥ |ds/dδ| / tan[α] − s</code>，对所有 δ 取最大，即<br>
-    <code>s₀,min = max<sub>δ</sub> { |ds/dδ|/tan30° − s }</code><br><br>
-    对余弦加速度规律，<code>|ds/dδ|</code> 在推程中点取最大、<code>s</code> 也在中点附近最大，
-    代入计算得 <code>s₀,min</code> → <span class="k">r<sub>b,min</sub> = 17.84 mm</span>。<br><br>
-    <b>回代校验</b>：取 r<sub>b</sub> = 17.84 mm 时，扫过整个转角得到的最大压力角恰好为
-    <span class="k">α<sub>max</sub> = 30.00°</span> = [α] ✔ 说明反解正确。<br><br>
-    <b>工程注意</b>：
-    <ul>
-      <li>实际取基圆半径时应比理论最小值<b>再放大一些</b>（留余量），并同时校核凸轮的结构尺寸、轴的强度和凸轮轮廓的最小曲率半径。</li>
-      <li>增大基圆半径可减小压力角，但会使凸轮尺寸变大、质量增加 —— 这是凸轮设计中的一对矛盾。</li>
-      <li>若从动件为滚子，还要校核 <code>r<sub>r</sub> &lt; ρ<sub>min</sub></code>（理论轮廓最小曲率半径），否则实际轮廓会出现尖点或交叉（运动失真）。</li>
-    </ul>`,
-  rig: false,
-},
-{
-  id: 'T11', ch: '齿轮机构', score: 12, diff: 1,
-  title: '标准直齿圆柱齿轮的几何尺寸',
-  stem: `一对标准直齿圆柱齿轮外啮合，模数 <code>m = 4 mm</code>，齿数 <code>z₁ = 20</code>、<code>z₂ = 40</code>，
-    正常齿制（<code>h*<sub>a</sub> = 1</code>，<code>c* = 0.25</code>）。<br>
-    求 (1) 两轮分度圆直径 d₁、d₂；(2) 标准中心距 a；(3) 传动比 i₁₂；(4) 小齿轮齿顶圆直径 d<sub>a1</sub>；
-    (5) 小齿轮齿根圆直径 d<sub>f1</sub>；(6) 用标准刀具加工时不产生根切的最少齿数 z<sub>min</sub>。`,
-  asks: [
-    { label: '分度圆直径 d₁', unit: 'mm', value: 80, tol: 0.01 },
-    { label: '标准中心距 a', unit: 'mm', value: 120, tol: 0.01 },
-    { label: '传动比 i₁₂', unit: '', value: 2, tol: 0.001 },
-    { label: '齿顶圆直径 d<sub>a1</sub>', unit: 'mm', value: 88, tol: 0.01 },
-    { label: '齿根圆直径 d<sub>f1</sub>', unit: 'mm', value: 70, tol: 0.01 },
-    { label: '不根切最少齿数 z<sub>min</sub>', unit: '', value: 17, tol: 0.01 },
-  ],
-  sol: `<b>公式一览</b>
-    <ul>
-      <li>分度圆：<code>d = m·z</code> → <span class="k">d₁ = 4×20 = 80 mm</span>，d₂ = 4×40 = 160 mm</li>
-      <li>标准中心距：<code>a = m(z₁ + z₂)/2</code> = 4×60/2 = <span class="k">120 mm</span></li>
-      <li>传动比：<code>i₁₂ = ω₁/ω₂ = z₂/z₁</code> = 40/20 = <span class="k">2</span>（减速）</li>
-      <li>齿顶圆：<code>d<sub>a</sub> = m(z + 2h*<sub>a</sub>)</code> → <span class="k">d<sub>a1</sub> = 4×22 = 88 mm</span></li>
-      <li>齿根圆：<code>d<sub>f</sub> = m(z − 2h*<sub>a</sub> − 2c*)</code> = 4×(20 − 3) = <span class="k">70 mm</span></li>
-      <li>不根切最少齿数：<code>z<sub>min</sub> = 2h*<sub>a</sub>/sin²α</code>，
-        标准压力角 α = 20° → z<sub>min</sub> = 2/sin²20° = <span class="k">17</span></li>
-    </ul>
-    <b>易错点</b>：
-    <ul>
-      <li>齿根圆用 <code>2h*<sub>a</sub> + 2c* = 3</code>（不是 2.5）—— 2.5 是
-        "齿顶高 + 顶隙"对应的<b>全齿高系数</b>，别混。标准全齿高 h = 2.25m 对应
-        h*<sub>a</sub> + h*<sub>f</sub> = 1 + 1.25 = 2.25 ✓</li>
-      <li>传动比是<b>齿数反比</b>：i₁₂ = z₂/z₁。</li>
-      <li>z₁ = 20 &gt; 17，所以本例小齿轮不根切，无需变位。</li>
-    </ul>`,
-  rig: false,
-},
-{
-  id: 'T12', ch: '齿轮系', score: 15, diff: 3,
-  title: '2K-H 行星轮系的传动比',
-  stem: `一 2K-H 行星轮系：太阳轮 1 齿数 <code>z₁ = 20</code>，行星轮 2 齿数 <code>z₂ = 30</code>，
-    内齿圈 3 齿数 <code>z₃ = 80</code>，系杆 H 与行星轮 2 的轴相连。内齿圈 3 固定不动。<br>
-    (1) 求转化机构的传动比 <code>i₁₃<sup>H</sup></code>；(2) 求 <code>i₁<sub>H</sub></code>；
-    (3) 若 <code>n₁ = 1500 r/min</code>，求系杆转速 n<sub>H</sub>。`,
-  asks: [
-    { label: '转化机构传动比 i₁₃<sup>H</sup>', unit: '', value: -4, tol: 0.01 },
-    { label: '传动比 i₁<sub>H</sub>', unit: '', value: 5, tol: 0.01 },
-    { label: '系杆转速 n<sub>H</sub>', unit: 'r/min', value: 300, tol: 0.5 },
-  ],
-  sol: `<b>方法：反转法（给整个轮系加上 −n<sub>H</sub>）</b><br>
-    加上 −n<sub>H</sub> 后系杆变成静止，周转轮系化为<b>定轴轮系</b>（转化机构），其传动比<br>
-    <code>i₁₃<sup>H</sup> = (n₁ − n<sub>H</sub>) / (n₃ − n<sub>H</sub>)</code><br><br>
-    <b>(1)</b> 符号判定：1 与 3 之间是外啮合（1–2）+ 内啮合（2–3），
-    外啮合对数 1 对 → 取负号。数值为齿数反比：<br>
-    <code>i₁₃<sup>H</sup> = −z₃/z₁ = −80/20</code> = <span class="k">−4</span><br><br>
-    <b>(2)</b> 内齿圈 3 固定 → <code>n₃ = 0</code>，代入：<br>
-    <code>(n₁ − n<sub>H</sub>)/(0 − n<sub>H</sub>) = −4</code><br>
-    <code>n₁ − n<sub>H</sub> = 4n<sub>H</sub></code> → <code>n₁ = 5n<sub>H</sub></code><br>
-    → <span class="k">i₁<sub>H</sub> = n₁/n<sub>H</sub> = 5</span><br>
-    也可直接记结论：<code>i₁<sub>H</sub> = 1 + z₃/z₁ = 1 + 4 = 5</code> ✔<br><br>
-    <b>(3)</b> <code>n<sub>H</sub> = n₁ / i₁<sub>H</sub> = 1500/5</code> = <span class="k">300 r/min</span>，
-    转向与太阳轮 1 相同。<br><br>
-    <b>易错点</b>：
-    <ul>
-      <li>符号！内齿圈与太阳轮<b>同向</b>转，所以 i₁₃<sup>H</sup> 为负（1 与 3 在转化机构中反向）。
-        忘写负号会得到 i₁<sub>H</sub> = −3 之类的错误结果。</li>
-      <li>行星轮 z₂ 是"惰轮"，<b>不影响数值大小</b>，只影响方向与装配。
-        所以题目给了 z₂ = 30 其实用不上 —— 这是常设的"干扰项"。</li>
-      <li>齿数必须满足装配条件 <code>(z₁ + z₃)/k = 整数</code>（k 为行星轮数）才能装得进去。
-        本例 (20+80)/1 = 100 ✓；若取 3 个行星轮，(20+80)/3 非整数，装不上。</li>
-    </ul>`,
-  rig: false,
-},
-{
-  id: 'T13', ch: '速度波动', score: 12, diff: 2,
-  title: '飞轮转动惯量的确定',
-  stem: `某机器在稳定运转阶段，等效驱动力矩为常数。已知一个运动循环内的<b>最大盈亏功</b>
-    <code>W<sub>max</sub> = 500 J</code>，主轴平均转速 <code>n = 600 r/min</code>，
-    要求运转不均匀系数 <code>δ = 0.02</code>。<br>
-    忽略除飞轮外其余构件的动能变化，求飞轮转动惯量 J<sub>F</sub>。`,
-  asks: [
-    { label: '飞轮转动惯量 J<sub>F</sub>', unit: 'kg·m²', value: 6.3326, tol: 0.05 },
-  ],
-  sol: `<b>公式</b>：<code>J<sub>F</sub> = W<sub>max</sub> / (ω<sub>m</sub>²·δ)</code><br><br>
-    <b>平均角速度</b>：<code>ω<sub>m</sub> = 2πn/60 = 2π×600/60</code> = <span class="k">62.8319 rad/s</span><br><br>
-    <b>代入</b>：<code>J<sub>F</sub> = 500 / (62.8319² × 0.02) = 500 / 78.957</code>
-    = <span class="k">6.333 kg·m²</span><br><br>
-    另一等价写法：<code>J<sub>F</sub> = 900·W<sub>max</sub> / (π²n²δ)</code>，结果相同 ✔<br><br>
-    <b>概念要点</b>
-    <ul>
-      <li><b>最大盈亏功 W<sub>max</sub></b> 是等效驱动力矩与等效阻力矩所作功的
-        <b>累积差值</b>的最大波动幅度（即 ΔW 曲线的峰谷差），不是某一瞬时的功率差。</li>
-      <li>飞轮的作用是"储存多余能量、补充不足能量"，
-        只能减小<b>周期性</b>速度波动；对非周期性波动无效（那要靠调速器）。</li>
-      <li>由公式可见：δ 越小（要求越平稳），J<sub>F</sub> 越大，且与 ω<sub>m</sub>² 成反比 ——
-        把飞轮装在<b>高速轴</b>上，所需转动惯量可大幅减小，这是设计中的关键技巧。</li>
-      <li>若机器本身其余构件的动能不可忽略，需先算出它们的等效转动惯量并从 J<sub>F</sub> 中扣除。</li>
-    </ul>`,
-  rig: false,
-},
-{
-  id: 'T14', ch: '平衡', score: 12, diff: 2,
-  title: '刚性转子的静平衡计算',
-  stem: `一转子在同一平面内有三个偏心质量：
-    <code>m₁ = 10 kg</code>、<code>r₁ = 100 mm</code>、方位角 <code>θ₁ = 0°</code>；
-    <code>m₂ = 15 kg</code>、<code>r₂ = 80 mm</code>、<code>θ₂ = 120°</code>；
-    <code>m₃ = 8 kg</code>、<code>r₃ = 120 mm</code>、<code>θ₃ = 240°</code>。<br>
-    现拟在半径 <code>r<sub>b</sub> = 150 mm</code> 处加一平衡质量。求平衡质量 <code>m<sub>b</sub></code> 及其方位角 <code>θ<sub>b</sub></code>
-    （方位角自 x 轴正向逆时针度量）。`,
-  asks: [
-    { label: '平衡质量 m<sub>b</sub>', unit: 'kg', value: 1.484737, tol: 0.005 },
-    { label: '方位角 θ<sub>b</sub>', unit: '°', value: 291.051724, tol: 0.15 },
-  ],
-  sol: `<b>静平衡条件</b>：<code>Σ m<sub>i</sub>r<sub>i</sub> + m<sub>b</sub>r<sub>b</sub> = 0</code>（矢量式）<br><br>
-    <b>分解到 x、y 方向</b>：
-    <table style="margin:6px 0;font-size:12px;border-collapse:collapse">
-      <tr style="color:var(--muted)"><td style="padding:2px 12px 2px 0">质量</td><td style="padding:2px 12px 2px 0">m·r (kg·mm)</td><td style="padding:2px 12px 2px 0">m·r·cosθ</td><td style="padding:2px 0">m·r·sinθ</td></tr>
-      <tr><td>1</td><td>1000</td><td>1000.00</td><td>0.00</td></tr>
-      <tr><td>2</td><td>1200</td><td>−600.00</td><td>1039.23</td></tr>
-      <tr><td>3</td><td>960</td><td>−480.00</td><td>−831.38</td></tr>
-      <tr style="color:var(--accent2)"><td>Σ</td><td>—</td><td><b>−80.00</b></td><td><b>207.85</b></td></tr>
-    </table>
-    <code>|Σmr| = √(80² + 207.85²) = 222.71 kg·mm</code>，方向角 <code>arctan(207.85/−80) = 111.05°</code>（第二象限）<br><br>
-    <b>平衡质量</b>：<code>m<sub>b</sub> = |Σmr| / r<sub>b</sub> = 222.71/150</code> = <span class="k">1.485 kg</span><br>
-    <b>方位</b>：平衡质量必须与不平衡量<b>反向</b>（相差 180°）：<br>
-    <code>θ<sub>b</sub> = 111.05° + 180°</code> = <span class="k">291.05°</span><br><br>
-    <b>易错点</b>
-    <ul>
-      <li>方向必须<b>反向</b>，写成 111.05° 是最常见的错误。</li>
-      <li>三个质量的方位角 0°/120°/240° 恰好均布，但<b>m·r 不等</b>（1000、1200、960），
-        所以并不平衡 —— 不要看到 120° 均布就下结论说已平衡。</li>
-      <li>静平衡只适用于<b>轴向尺寸较小</b>（b/D &lt; 0.2）的盘状转子。
-        细长转子必须做<b>动平衡</b>，需要选择两个平衡平面，且不能只靠一个平衡质量解决。</li>
-    </ul>`,
-  rig: false,
-},
-{
-  id: 'T15', ch: '其他机构', score: 8, diff: 1,
-  title: '外槽轮机构的运动系数',
-  stem: `一外槽轮机构，槽轮的径向槽数 <code>z = 4</code>，拨盘上的圆销数 <code>z<sub>p</sub> = 1</code>。<br>
-    求 (1) 运动系数 k；(2) 槽轮每次转位的角度。`,
-  asks: [
-    { label: '运动系数 k', unit: '', value: 0.25, tol: 0.005 },
-    { label: '每次转位角度', unit: '°', value: 90, tol: 0.05 },
-  ],
-  sol: `<b>(1) 运动系数</b>（槽轮转动时间 / 拨盘转一周的时间）：<br>
-    <code>k = z<sub>p</sub>·(z − 2) / (2z) = 1 × (4 − 2) / (2×4)</code> = <span class="k">0.25</span><br><br>
-    <b>(2) 每次转位角度</b>：槽轮每次转过相邻两槽的夹角，<br>
-    <code>2φ = 360°/z = 360/4</code> = <span class="k">90°</span><br><br>
-    <b>要点</b>
-    <ul>
-      <li>k 表示槽轮的运动时间占拨盘一个周期的比例。要保证槽轮能可靠地静止，
-        必须 <code>k &lt; 0.5</code>（否则槽轮无静止时间）。
-        由公式可知 <code>z<sub>p</sub>(z−2)/(2z) &lt; 0.5</code> → <code>z<sub>p</sub> &lt; 2z/(z−2)</code>。</li>
-      <li>z = 4、z<sub>p</sub> = 1 时 k = 0.25，即槽轮只转 1/4 圈的时间，静止 3/4 圈的时间。</li>
-      <li>圆销数 z<sub>p</sub> 不能任意增大：z<sub>p</sub> 越大 k 越大，但受上述上限约束。
-        z = 4 时最多 4 个销（k = 1 已无静止时间，实际取 z<sub>p</sub> ≤ 3）。</li>
-      <li>槽轮的<b>运动特性系数</b>与<b>转位角度</b>是两个不同的概念，别混。</li>
-    </ul>`,
-  rig: false,
-},
-{
-  id: 'T16', ch: '连杆机构', score: 6, diff: 2,
-  title: '最小传动角出现的位置',
-  kind: 'choice',
-  stem: `以曲柄为原动件的曲柄摇杆机构，其最小传动角 γ<sub>min</sub> 出现在（　　）`,
-  options: [
-    '曲柄与机架共线时',
-    '曲柄与连杆共线时',
-    '连杆与摇杆共线时',
-    '摇杆处于极限位置时',
-  ],
-  correct: 0,
-  sol: `<b>答案 A。</b><br><br>
-    传动角 γ 是连杆与摇杆在 C 点所夹的锐角。<br>
-    <b>结论</b>：曲柄摇杆机构中，γ 的极值出现在<b>曲柄与机架共线</b>（φ₂ = 0° 或 180°）的两处；
-    分别算出这两个位置的 γ，其中<b>较小者</b>即为 γ<sub>min</sub>。<br><br>
-    <b>用数据验证</b>：对 T3 的机构（a = 25、b = 60、c = 55、d = 80），
-    程序扫过整周得到的 γ<sub>min</sub> = 48.19°，出现位置正是 <span class="k">φ₂ = 180°</span>，
-    即曲柄与机架反向共线处 ✔<br><br>
-    <b>为什么</b>：把 γ 写成 φ₂ 的函数可见，γ 的极值点由 <code>∂γ/∂φ₂ = 0</code> 决定，
-    而该条件化简后恰好对应曲柄与机架共线。也可以从几何直观理解：
-    曲柄与机架共线时，连杆相对摇杆的"张角"达到极值。<br><br>
-    <b>其他选项为什么错</b>：
-    <ul>
-      <li>B（曲柄与连杆共线）是<b>摇杆处于极限位置</b>的条件（即极位），
-        此时摇杆速度为零，讨论传动角没有意义。</li>
-      <li>C（连杆与摇杆共线）会使机构处于<b>死点</b>（γ → 0），
-        但那要求 C、B、D 共线，通常是不可能的装配状态。</li>
-      <li>D（摇杆极限位置）＝ 选项 B 的条件，同样与 γ<sub>min</sub> 无关。</li>
-    </ul>`,
-  rig: () => examCrankRocker(25, 60, 55, 80),
-},
-{
-  id: 'T17', ch: '凸轮机构', score: 6, diff: 2,
-  title: '滚子从动件凸轮避免运动失真的条件',
-  kind: 'choice',
-  stem: `设计滚子从动件盘形凸轮时，为避免凸轮实际轮廓出现尖点或交叉（运动失真），应满足（　　）`,
-  options: [
-    '滚子半径 r<sub>r</sub> ≥ 理论轮廓最小曲率半径 ρ<sub>min</sub>',
-    '滚子半径 r<sub>r</sub> < 理论轮廓最小曲率半径 ρ<sub>min</sub>',
-    '基圆半径尽量取小，以减小凸轮尺寸',
-    '压力角尽量取大，以提高传力效率',
-  ],
-  correct: 1,
-  sol: `<b>答案 B。</b><br><br>
-    实际轮廓是理论轮廓（滚子中心轨迹）沿法线<b>内缩 r<sub>r</sub></b> 得到的包络线。
-    所以实际轮廓的曲率半径 <code>ρ<sub>a</sub> = ρ<sub>min</sub> − r<sub>r</sub></code>（在凸的部分）：<br>
-    <ul>
-      <li><code>r<sub>r</sub> < ρ<sub>min</sub></code> → ρ<sub>a</sub> &gt; 0，轮廓正常 ✔</li>
-      <li><code>r<sub>r</sub> = ρ<sub>min</sub></code> → ρ<sub>a</sub> = 0，出现<b>尖点</b>，磨损极快</li>
-      <li><code>r<sub>r</sub> > ρ<sub>min</sub></code> → ρ<sub>a</sub> &lt; 0，实际轮廓出现<b>交叉</b>，
-        从动件不能实现预定运动，即<b>运动失真</b> ✘</li>
-    </ul>
-    工程上取 <code>r<sub>r</sub> ≤ 0.8 ρ<sub>min</sub></code> 并留出加工余量。<br>
-    若 ρ<sub>min</sub> 太小，解决途径是<b>增大基圆半径</b>或改进运动规律。<br><br>
-    <b>其他选项</b>：
-    <ul>
-      <li>A 恰好说反了。</li>
-      <li>C 错：基圆半径过小会使压力角增大、ρ<sub>min</sub> 减小，反而更容易失真。</li>
-      <li>D 错：压力角大意味着传力性能差、侧向力大，是设计要<b>限制</b>的量（一般要求 α ≤ [α]）。</li>
-    </ul>
-    <b>顺带记住一对矛盾</b>：基圆半径↑ → 压力角↓、传力好，但凸轮尺寸↑、质量↑。
-    设计就是在"传力性能"与"结构紧凑"之间取平衡。`,
-  rig: false,
-},
-];
-
-/* ---- 把考题模型做成可载入求解器的形式（初位形与转速与题目描述一致）---- */
-function examCrankRocker(a, b, c, d, phiDeg = 60, rpm = 60) {
-  const k = fbKinematics({ a, b, c, d, config: 1, theta2: phiDeg * DEG, omega2: 1, alpha2: 0 });
-  if (!k.ok) return null;
-  const bb = rigBuilder();
-  const pA = bb.P(0, 0, true), pD = bb.P(d, 0, true);
-  const pB = bb.P(k.B.x, k.B.y), pC = bb.P(k.C.x, k.C.y);
-  const l1 = bb.L([pA, pB], 1.5, 0.005);
-  bb.L([pB, pC], 3, 0.02);
-  bb.L([pC, pD], 2, 0.01);
-  return { points: bb.pts, links: bb.links, prisms: [], gears: [], loads: [],
-    driver: { link: l1, type: 'rot', n: rpm, v: 0 },
-    useGravity: false, useInertia: true, useFriction: false, f: 0.1, rj: 8 };
-}
-function examSliderCrank(r, l, e, phiDeg = 60, rpm = 60) {
-  const phi = phiDeg * DEG;
-  const Bc = { x: r * Math.cos(phi), y: r * Math.sin(phi) };
-  const dy = e - Bc.y;
-  const cx = Bc.x + Math.sqrt(Math.max(1, l * l - dy * dy));
-  const bb = rigBuilder();
-  const pA = bb.P(0, 0, true), pB = bb.P(Bc.x, Bc.y);
-  const pC = bb.P(cx, e), pC2 = bb.P(cx + 40, e);
-  const l1 = bb.L([pA, pB], 2, 0.01);
-  bb.L([pB, pC], 4, 0.05);
-  const l3 = bb.L([pC, pC2], 5, 0.02);
-  bb.PR(l3, null, 1, 0);
-  return { points: bb.pts, links: bb.links, prisms: bb.prisms, gears: [], loads: [],
-    driver: { link: l1, type: 'rot', n: rpm, v: 0 },
-    useGravity: false, useInertia: true, useFriction: false, f: 0.1, rj: 8 };
-}
-
-/* ---- 渲染与判题 ---- */
-const EXAM_CH = ['全部', '结构分析', '运动分析', '力分析', '效率与自锁', '连杆机构',
-  '凸轮机构', '齿轮机构', '齿轮系', '速度波动', '平衡', '其他机构'];
-const EXAM_STATE = { filter: '全部', graded: {}, revealed: {} };
-
-function examRender() {
-  const list = $('exam-list');
-  const items = EXAM.filter(q => EXAM_STATE.filter === '全部' || q.ch === EXAM_STATE.filter);
-  let h = '';
-  for (const q of items) {
-    const stars = '★'.repeat(q.diff) + '☆'.repeat(3 - q.diff);
-    h += `<div class="card qcard" data-q="${q.id}">
-      <div class="qhead">
-        <span class="qid">${q.id}</span>
-        <span class="qtitle">${q.title}</span>
-        <span class="qmeta">${q.ch} · ${q.score} 分 · ${stars}</span>
-      </div>
-      <div class="qbody">
-        <div class="qstem">${q.stem}</div>
-        <div class="qask">`;
-    if (q.kind === 'choice') {
-      q.options.forEach((op, i) => {
-        h += `<label class="opt"><input type="radio" name="${q.id}" value="${i}"
-          data-choice="${q.id}"><span>${String.fromCharCode(65 + i)}. ${op}</span></label>`;
-      });
-      h += `<div id="${q.id}-verdict" class="verdict"></div>`;
-    } else {
-      q.asks.forEach((ask, i) => {
-        h += `<div class="row">
-          <label>${ask.label}</label>
-          <input type="number" step="any" data-num="${q.id}-${i}" placeholder="填数值">
-          <span><span class="unit">${ask.unit}</span>
-            <span class="verdict" id="${q.id}-v${i}"></span></span>
-        </div>`;
-      });
-    }
-    h += `</div>
-        <div class="qsol" id="${q.id}-sol" style="display:none">${q.sol}</div>
-      </div>
-      <div class="exambar">
-        <button class="act primary" data-grade="${q.id}">判题</button>
-        <button class="act" data-reveal="${q.id}">查看解析</button>
-        ${q.rig ? `<button class="act" data-loadrig="${q.id}">在求解器中打开</button>` : ''}
-        <span class="score" id="${q.id}-score"></span>
-      </div>
-    </div>`;
-  }
-  list.innerHTML = h || '<div class="card">该章节暂无题目。</div>';
-  examScore();
-}
-
-function examGrade(qid) {
-  const q = EXAM.find(v => v.id === qid);
-  if (!q) return;
-  let got = 0, total = 0, allRight = true;
-  const detail = [];
-  if (q.kind === 'choice') {
-    const sel = document.querySelector(`input[data-choice="${qid}"]:checked`);
-    const vEl = $(qid + '-verdict');
-    total = q.score;
-    if (!sel) { vEl.className = 'verdict bad'; vEl.textContent = '请先选择一项'; return; }
-    const okk = +sel.value === q.correct;
-    vEl.className = 'verdict ' + (okk ? 'ok' : 'bad');
-    vEl.textContent = okk ? '✔ 正确' : `✘ 错，正确答案是 ${String.fromCharCode(65 + q.correct)}`;
-    got = okk ? q.score : 0;
-    allRight = okk;
-  } else {
-    const per = q.score / q.asks.length;
-    total = q.score;
-    q.asks.forEach((ask, i) => {
-      const el = document.querySelector(`input[data-num="${qid}-${i}"]`);
-      const vEl = $(`${qid}-v${i}`);
-      const raw = (el.value || '').trim();
-      if (raw === '') { vEl.className = 'verdict'; vEl.textContent = '未作答'; allRight = false; return; }
-      const val = parseFloat(raw);
-      const okk = isFinite(val) && Math.abs(val - ask.value) <= ask.tol;
-      vEl.className = 'verdict ' + (okk ? 'ok' : 'bad');
-      vEl.textContent = okk ? '✔' : `✘ 应为 ${ask.value}`;
-      if (okk) got += per; else allRight = false;
-      detail.push(okk);
-    });
-  }
-  const sEl = $(qid + '-score');
-  sEl.textContent = `本题得分 ${got.toFixed(1)} / ${total}`;
-  sEl.style.color = allRight ? 'var(--ok)' : 'var(--warn)';
-  EXAM_STATE.graded[qid] = { got, total };
-  examScore();
-}
-
-function examScore() {
-  let got = 0, total = 0, n = 0;
-  for (const k in EXAM_STATE.graded) {
-    const g = EXAM_STATE.graded[k];
-    got += g.got; total += g.total; n++;
-  }
-  $('exam-score').textContent = n
-    ? `已判 ${n} 题：合计 ${got.toFixed(1)} / ${total} 分`
-    : '尚未判题';
-}
-
-function examInit() {
-  $('exam-filter').innerHTML = EXAM_CH.map(c =>
-    `<button class="preset" data-ch="${c}"${c === '全部' ? ' style="border-style:solid;color:var(--accent2);border-color:var(--accent2)"' : ''}>${c}</button>`).join('');
-  examRender();
-
-  $('exam-filter').addEventListener('click', e => {
-    const b = e.target.closest('button[data-ch]');
-    if (!b) return;
-    EXAM_STATE.filter = b.dataset.ch;
-    $('exam-filter').querySelectorAll('button').forEach(x => {
-      const on = x.dataset.ch === EXAM_STATE.filter;
-      x.style.borderStyle = on ? 'solid' : 'dashed';
-      x.style.color = on ? 'var(--accent2)' : '';
-      x.style.borderColor = on ? 'var(--accent2)' : '';
-    });
-    examRender();
-  });
-
-  $('exam-list').addEventListener('click', e => {
-    const g = e.target.closest('[data-grade]');
-    if (g) return examGrade(g.dataset.grade);
-    const r = e.target.closest('[data-reveal]');
-    if (r) {
-      const sol = $(r.dataset.reveal + '-sol');
-      const on = sol.style.display === 'none';
-      sol.style.display = on ? '' : 'none';
-      r.textContent = on ? '收起解析' : '查看解析';
-      return;
-    }
-    const l = e.target.closest('[data-loadrig]');
-    if (l) {
-      const q = EXAM.find(v => v.id === l.dataset.loadrig);
-      const m = q && q.rig ? q.rig() : null;
-      if (!m) { alert('本题为概念/计算题，没有可直接搭出的机构模型。'); return; }
-      $('rig-gravity').checked = m.useGravity;
-      $('rig-inertia').checked = m.useInertia;
-      $('rig-friction').checked = m.useFriction;
-      rigLoadModel(m);
-      document.querySelector('nav button[data-tab="rig"]').click();
-      // 停在题目的位形上，读数才与题目一致
-      RIG.playing = false;
-      $('rig-play').textContent = '播放';
-      $('rig-phase').value = 0;
-      $('rig-phase-range').value = 0;
-      if (RIG.setPhase) RIG.setPhase(0, false);
-      $('rig-preset-note').textContent =
-        `已从「考题演练 ${q.id}」载入模型：${q.title}（已暂停在题目位形）`;
-    }
-  });
-
-  $('exam-reset').addEventListener('click', () => {
-    EXAM_STATE.graded = {};
-    examRender();
-    EXAM_STATE.graded = {};
-  });
-  $('exam-expand').addEventListener('click', e => {
-    const on = e.target.dataset.on !== '1';
-    e.target.dataset.on = on ? '1' : '0';
-    e.target.textContent = on ? '收起全部解析' : '展开全部解析';
-    document.querySelectorAll('#exam-list .qsol').forEach(s => { s.style.display = on ? '' : 'none'; });
-    document.querySelectorAll('#exam-list [data-reveal]').forEach(b => {
-      b.textContent = on ? '收起解析' : '查看解析';
-    });
-  });
-}
-
 /* ---------------- 启动 ---------------- */
 camFollowerDefaults();
 onResizeAll();
 fbRebuild();
 camRebuild();
 dofUpdate();
+if(globalThis.MechJoints)RIG_PRESETS.forEach(p=>{const make=p.make;p.make=()=>MechJoints.adoptLegacy(make()).model;});
 rigInit();
-examInit();
 requestAnimationFrame(tick);
 rigMainLoop();
 document.querySelector('nav button').click();
 </script>
 <script src="workbench-core.js"></script>
 <script src="workbench-analysis.js"></script>
+<script src="result-report.js"></script>
 <script src="workbench-ui.js"></script>
 <script src="web-adapter.js"></script>
+<script src="studio-supports.js"></script>
+<script src="studio-ui.js"></script>
+<script src="cad-language.js"></script>
+<script src="cad-ui.js"></script>
+<script src="mechanical-ui.js"></script>
+<script src="joint-ui.js"></script>
+<script src="guide-ui.js"></script>
 </body>
 </html>

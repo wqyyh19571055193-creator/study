@@ -135,7 +135,7 @@
     const m=ensure(clone(original)),pi=index(m,'points',pointId),li=index(m,'links',linkId);
     if(!m.links[li].pts.includes(pi))throw Error('所选构件不连接该铰点。');
     if(m.links.filter(l=>l.pts.includes(pi)).length<2)throw Error('此点没有多个构件连接。');
-    const p={...m.points[pi],ground:false}; delete p.id;m.points.push(p);ensure(m);
+    const p={...m.points[pi],ground:false,jointType:'single'}; delete p.id;m.points.push(p);ensure(m);
     m.links[li].pts=m.links[li].pts.map(i=>i===pi?m.points.length-1:i);
     // Existing dimensions stay attached to the original joint; the split point is explicitly new.
     return m;

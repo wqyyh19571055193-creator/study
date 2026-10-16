@@ -19,8 +19,8 @@
       <label for="wb-filter">画布选择范围</label><select id="wb-filter"><option value="all">铰点与构件</option><option value="points">只选铰点</option><option value="links">只选构件</option></select>
       <div id="wb-selection" class="wb-pills"></div><div id="wb-joint-info" class="wb-message"></div>
       <div class="wb-help">Ctrl 增选 · Shift 拖动框选 · Alt+单击轮换重叠杆件<br>空白处拖动平移；编辑时回到初始位形。</div>
-      <div class="btnrow"><button class="act" id="wb-merge">合并共用铰点</button><button class="act" id="wb-cross">交点建铰链</button></div>
-      <label for="wb-split-link">从选中铰点拆出的构件</label><select id="wb-split-link"></select><div class="btnrow"><button class="act" id="wb-split">拆分此连接</button><button class="act" id="wb-clear-selection">取消选择</button></div>
+      <div id="wb-composite-controls"><div class="btnrow"><button class="act" id="wb-merge">合并为复合铰链</button><button class="act" id="wb-cross">交点启用复合</button></div>
+      <label for="wb-split-link">从选中铰点拆出的构件</label><select id="wb-split-link"></select><div class="btnrow"><button class="act" id="wb-split">拆分此连接</button><button class="act" id="wb-clear-selection">取消选择</button></div></div>
       <div class="btnrow"><button class="act" id="wb-fixed">固定所选铰点</button><button class="act" id="wb-free">取消固定铰</button></div>
       <div class="btnrow"><button class="act" id="wb-frame">所选构件设为机架</button><button class="act" id="wb-unframe">取消机架构件</button></div>
     </section>
@@ -54,11 +54,11 @@
   const idList=(kind,ids)=>ids.map(id=>M.index(RIG.model,kind,id));
   function pause(){RIG.playing=false;$w('rig-play').textContent='播放';}
   function editPose(){pause();if(RIG.demo)rigDemoStop();RIG.t=0;if(RIG.comp&&RIG.q0){const s=rigAnalyze(RIG.comp,0,RIG.q0);RIG.sol=s.ok?s:null;}else RIG.sol=null;}
-  function openPanel(){panel.classList.toggle('wb-open',innerWidth<=1250);panel.classList.remove('wb-hidden');bench.classList.remove('wb-collapsed');requestAnimationFrame(onResizeAll);}
+  function openPanel(){if(window.MechStudio){window.MechStudio.show('properties',false);return;}panel.classList.toggle('wb-open',innerWidth<=1250);panel.classList.remove('wb-hidden');bench.classList.remove('wb-collapsed');requestAnimationFrame(onResizeAll);}
   function stash(){U.undo.push(snapshot());if(U.undo.length>80)U.undo.shift();U.redo=[];}
   function refreshModel(){RIG.sol=null;RIG.sweep=null;RIG.q0=null;RIG.t=0;rigRenderLoads();rigSyncDriverSelect(true);rigSolve();syncSelection();}
   function commit(m,label){
-    M.ensure(m);if(JSON.stringify(m)===snapshot()){message('模型未发生变化。');return;}
+    M.ensure(m);MechJoints.assert(m);if(JSON.stringify(m)===snapshot()){message('模型未发生变化。');return;}
     stash();pause();RIG.model=rigNormModel(m);refreshModel();message(label+(RIG.err?' · 当前诊断：'+RIG.err:''),!!RIG.err);
   }
   function restore(from,to){if(!from.length)return;to.push(snapshot());pause();RIG.model=rigNormModel(JSON.parse(from.pop()));U.preview=null;$w('wb-preview').hidden=true;U.restoring=true;try{refreshModel();}finally{U.restoring=false;}message('已恢复模型；计算结果需要重新计算。');}
@@ -66,16 +66,17 @@
     const s=snapshot();if(s!==U.signature){U.signature=s;U.revision++;invalidate();syncSelection();renderDimensions();refreshTargets();}
     $w('wb-revision').textContent='模型版本 '+U.revision;
   }
-  function invalidate(){if(U.result){$w('wb-result-status').textContent='模型或计算设置已改变 · 待重新计算';$w('wb-result-status').classList.add('stale');}$w('wb-export').disabled=true;}
+  function invalidate(){if(U.result){$w('wb-result-status').textContent='模型或计算设置已改变 · 待重新计算';$w('wb-result-status').classList.add('stale');}$w('wb-export').disabled=true;const report=$w('wb-report');if(report){report.setAttribute('data-stale','true');report.querySelector('h4').textContent='原结果已过期 · 请重新计算';}if($w('wb-report-export'))$w('wb-report-export').disabled=true;}
   const oldBackup=rigBackup;rigBackup=()=>{stash();oldBackup();};
   const oldSolve=rigSolve;rigSolve=function(){
     M.ensure(RIG.model);
+    const jointError=MechJoints.error(RIG.model);
     const invalid=RIG.model.dimensions.find(d=>d.mode==='driving'&&Math.abs(M.measure(RIG.model,d)-d.value)>1e-3);
     let rejected=false;
-    if(invalid&&U.signature&&!U.restoring){RIG.model=rigNormModel(JSON.parse(U.signature));rejected=true;}
+    if((invalid||jointError)&&U.signature&&!U.restoring){RIG.model=rigNormModel(JSON.parse(U.signature));rejected=true;}
     const current=snapshot();
     if(!U.restoring&&U.signature&&current!==U.signature&&U.undo.at(-1)!==U.signature){U.undo.push(U.signature);if(U.undo.length>80)U.undo.shift();U.redo=[];}
-    const r=oldSolve();changed();if(rejected)message('本次编辑会破坏已有驱动尺寸，已恢复。请通过智能尺寸修改，或先移除尺寸约束。',true);return r;
+    const r=oldSolve();changed();if(rejected)message(jointError||'本次编辑会破坏已有驱动尺寸，已恢复。请通过智能尺寸修改，或先移除尺寸约束。',true);return r;
   };
   const oldLoad=rigLoadModel;rigLoadModel=function(m){stash();U.points=[];U.links=[];U.redo=[];const r=oldLoad(M.ensure(m));changed();return r;};
   const oldTool=rigTool;rigTool=function(t){U.points=[];U.links=[];U.dimension=false;const r=oldTool(t);syncSelection();return r;};
@@ -100,7 +101,7 @@
       info=`P${i+1} · ${p.ground?'固定铰支座':'活动铰'}\n连接：${owners.map(i=>'L'+(i+1)).join('、')||'无'}\n`;
       const frames=owners.filter(j=>RIG.model.links[j].pts.every(p=>RIG.model.points[p].ground)).length;
       const moving=owners.length-frames;const pairs=p.ground?moving:Math.max(0,moving-1);
-      info+=`${owners.length>=3?'复合铰链 · ':''}与求解器对应的转动副：${pairs} 个`;
+      info+=`${p.jointType==='compound'?'已启用复合铰链':'普通铰点'} · 转动副：${pairs} 个`;
       for(const j of owners)split.add(new Option('L'+(j+1),RIG.model.links[j].id));
     }else info='先选铰点可查看连接构件；合并时第一选中点为目标。';
     $w('wb-joint-info').textContent=info;
@@ -126,8 +127,8 @@
     const box=$w('wb-dim-list');box.replaceChildren();
     for(const d of RIG.model.dimensions){const row=document.createElement('div');row.className='wb-dim-item';const text=document.createElement('span');text.textContent=`${d.mode==='driving'?'驱动':'参考'} · ${d.kind==='angle'?'夹角':d.kind==='horizontal'?'Δx':d.kind==='vertical'?'Δy':'距离'} ${M.measure(RIG.model,d).toFixed(2)} ${d.kind==='angle'?'°':'mm'}`;const b=document.createElement('button');b.className='act';b.textContent='移除';b.onclick=safe(()=>{const m=M.clone(RIG.model);m.dimensions=m.dimensions.filter(x=>x.id!==d.id);commit(m,'已移除尺寸约束。');});row.append(text,b);box.append(row);}
   }
-  bind('wb-merge',()=>{commit(M.merge(RIG.model,U.points),'已合并为共用铰点。');});
-  bind('wb-cross',()=>{commit(M.intersect(RIG.model,U.links),'已在交点连接构件。');});
+  bind('wb-merge',()=>{commit(MechJoints.merge(RIG.model,U.points,M),'已通过复合铰链工具合并连接。');});
+  bind('wb-cross',()=>{commit(MechJoints.intersect(RIG.model,U.links,M),'已在交点显式启用复合铰链。');});
   bind('wb-split',()=>{if(U.points.length!==1)throw Error('请选择一个共用铰点。');commit(M.split(RIG.model,U.points[0],$w('wb-split-link').value),'已拆出连接，新铰点与原点重合，可选点后拖动。');});
   bind('wb-clear-selection',()=>{U.points=[];U.links=[];syncSelection();rigDraw(rigMain);});
   const grounding=(kind,on)=>commit(M.ground(RIG.model,kind,selected(kind),on),on?'已设置固定约束。':'已取消所选固定约束。');
@@ -182,7 +183,6 @@
     ctx.save();
     for(const id of selected('links')){const l=m.links[M.index(m,'links',id)];for(let i=1;i<l.pts.length;i++){const a=pos(m.points[l.pts[i-1]].id),b=pos(m.points[l.pts[i]].id);sc.line(a.x,a.y,b.x,b.y,'rgba(77,163,255,.6)',9);}}
     for(const id of selected('points')){const p=pos(id);ctx.strokeStyle='#4da3ff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(sc.X(p.x),sc.Y(p.y),12,0,Math.PI*2);ctx.stroke();}
-    m.points.forEach((p,i)=>{const owners=m.links.filter(l=>l.pts.includes(i));if(owners.length>=3){const q=pos(p.id);ctx.strokeStyle='#ffb454';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(sc.X(q.x),sc.Y(q.y),9,0,Math.PI*2);ctx.stroke();sc.label(q.x,q.y,'复合 '+owners.length+' 构件','#ffb454',18,10);}});
     for(const d of m.dimensions){try{const pts=d.points.map(pos);const copy={points:pts.map((p,i)=>({...p,id:d.points[i]}))};const v=M.measure(copy,d);const color=d.mode==='driving'?'#ffb454':'#91a7c5';const a=pts[0],b=pts[1];
       if(d.kind!=='angle'){const dx=sc.X(b.x)-sc.X(a.x),dy=sc.Y(b.y)-sc.Y(a.y),len=Math.hypot(dx,dy)||1,nx=-dy/len*25,ny=dx/len*25;ctx.strokeStyle=color;ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(sc.X(a.x),sc.Y(a.y));ctx.lineTo(sc.X(a.x)+nx,sc.Y(a.y)+ny);ctx.lineTo(sc.X(b.x)+nx,sc.Y(b.y)+ny);ctx.lineTo(sc.X(b.x),sc.Y(b.y));ctx.stroke();ctx.setLineDash([]);ctx.font='11px Segoe UI';ctx.fillStyle=color;ctx.fillText(`${d.mode==='reference'?'参考 ':''}${d.kind==='horizontal'?'Δx ':d.kind==='vertical'?'Δy ':''}${v.toFixed(2)} mm`,(sc.X(a.x)+sc.X(b.x))/2+nx+3,(sc.Y(a.y)+sc.Y(b.y))/2+ny-4);}
       else sc.label((a.x+b.x)/2,(a.y+b.y)/2,`∠ ${v.toFixed(2)}°`,color,-25,11);
@@ -191,9 +191,9 @@
     ctx.restore();
   }
   window.addEventListener('keydown',e=>{
-    if(!$w('panel-rig').classList.contains('active'))return;
+    if(!$w('panel-rig').classList.contains('active')||document.querySelector('dialog[open]'))return;
     const typing=/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.target.isContentEditable;
-    if(typing){e.stopImmediatePropagation();return;}
+    if(typing)return;
     const k=e.key.toLowerCase();
     if((e.ctrlKey||e.metaKey)&&['z','y'].includes(k)){e.preventDefault();e.stopImmediatePropagation();restore(k==='y'||e.shiftKey?U.redo:U.undo,k==='y'||e.shiftKey?U.undo:U.redo);}
     else if(k==='d'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();e.stopImmediatePropagation();$w('wb-dimension').click();}
@@ -216,12 +216,13 @@
   const readRequest=()=>({target:$w('wb-target').value,metrics:[...$w('wb-metrics').querySelectorAll('input:checked:not(:disabled)')].map(x=>x.value),range:$w('wb-range').value,duration:Number($w('wb-duration').value),samples:181,time:RIG.t||0});
   const requestKey=r=>JSON.stringify({...r,time:r.range==='scan'?0:r.time});
   function calculate(request=readRequest()){
-    pause();const result=MechAnalysis.compute(RIG.model,request,engine);U.result=result;U.resultSignature=snapshot();U.requestSignature=requestKey(request);renderResult();return result;
+    pause();const result=MechAnalysis.compute(RIG.model,request,engine);$w('wb-target').value=request.target;setMetrics();for(const cb of $w('wb-metrics').querySelectorAll('input'))cb.checked=!cb.disabled&&request.metrics.includes(cb.value);$w('wb-range').value=request.range==='scan'?'scan':'current';if(request.duration>0)$w('wb-duration').value=request.duration;result.report=MechReport.explain(result,RIG.model);U.result=result;U.resultSignature=snapshot();U.requestSignature=requestKey(request);renderResult();return result;
   }
   bind('wb-calculate',()=>{message('正在计算所选结果…');setTimeout(safe(()=>{calculate();message('计算完成。');}),20);});
   for(const id of ['wb-metrics','wb-range','wb-duration'])$w(id).addEventListener('change',invalidate);
-  function renderResult(){const r=U.result,box=$w('wb-results');box.replaceChildren();const table=document.createElement('table');const head=table.insertRow();for(const text of ['结果 / 单位',r.range==='scan'?'最小值 @ s':'当前值',...(r.range==='scan'?['最大值 @ s']:[])]){const th=document.createElement('th');th.textContent=text;head.append(th);}
+  function renderResult(){const r=U.result,box=$w('wb-results');box.replaceChildren();const report=document.createElement('section');report.className='result-narrative';report.id='wb-report';const title=document.createElement('h4');title.textContent='文字结论与数据解释';report.append(title);for(const text of r.report.lines){const p=document.createElement('p');p.textContent=text;report.append(p);}box.append(report);const reportButton=document.createElement('button');reportButton.id='wb-report-export';reportButton.className='act report-export';reportButton.textContent='下载文字报告';reportButton.onclick=()=>{if($w('wb-export').disabled||snapshot()!==U.resultSignature){message('结果已过期，请重新计算。',true);return;}const url=URL.createObjectURL(new Blob(['\ufeff'+r.report.text],{type:'text/plain;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='机构计算报告.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};box.append(reportButton);const table=document.createElement('table');const head=table.insertRow();for(const text of ['结果 / 单位',r.range==='scan'?'最小值 @ s':'当前值',...(r.range==='scan'?['最大值 @ s']:[])]){const th=document.createElement('th');th.textContent=text;head.append(th);}
     const f=n=>Number(n).toPrecision(5);for(const s of r.series){const row=table.insertRow();row.insertCell().textContent=`${s.label} (${s.unit})`;row.insertCell().textContent=r.range==='scan'?`${f(s.min.value)} @ ${f(s.min.t)}`:f(s.values[0].value);if(r.range==='scan')row.insertCell().textContent=`${f(s.max.value)} @ ${f(s.max.t)}`;}box.append(table);
+    if(r.range==='scan'){const d=document.createElement('details');d.className='result-samples';const h=document.createElement('summary');h.textContent='逐时刻数据（'+r.samples+' 行）';d.append(h);const sc=document.createElement('div');sc.className='result-sample-scroll';const t=document.createElement('table'),head=t.insertRow();for(const label of ['时间 s',...r.series.map(s=>s.label+' / '+s.unit),'状态']){const th=document.createElement('th');th.textContent=label;head.append(th);}const failed=new Map(r.failures.map(s=>[s.t,s.error]));r.series[0].values.forEach((v,i)=>{const row=t.insertRow();for(const value of [f(v.t),...r.series.map(s=>s.values[i].value===null?'—':f(s.values[i].value)),failed.has(v.t)?'失败：'+failed.get(v.t):'有效'])row.insertCell().textContent=value;});sc.append(t);d.append(sc);box.append(d);}
     $w('wb-result-status').textContent=`${r.targetLabel} · ${r.range==='scan'?r.samples+' 个采样点 · 采样极值':'t = '+r.time.toFixed(4)+' s'}${r.failures.length?' · '+r.failures.length+' 个失败样本（曲线断开）':''}`;$w('wb-result-status').classList.remove('stale');
     if(r.failures.length){const p=document.createElement('p');p.className='wb-message error';p.textContent='首个失败：t='+r.failures[0].t.toFixed(4)+' s，'+r.failures[0].error;box.append(p);}
     const sel=$w('wb-series');sel.replaceChildren();for(const s of r.series)sel.add(new Option(s.label+' ('+s.unit+')',s.key));sel.hidden=r.range!=='scan';$w('wb-chart').hidden=r.range!=='scan';$w('wb-export').disabled=false;drawChart();
@@ -233,7 +234,7 @@
   function diagnose(){const c=rigCompile(M.clone(RIG.model));if(!c.ok)return{ok:false,error:c.err};const d=rigDofDiagnose(c,RIG.model);return{ok:!d.err,degreesOfFreedom:c.dof,coordinates:c.n,constraints:c.m,error:RIG.err||d.err||null,hints:d.hints};}
   function context(){M.ensure(RIG.model);return{revision:U.revision,units:{length:'mm',time:'s',force:'N',torque:'N·m'},selection:{points:U.points,links:U.links},model:{points:RIG.model.points.map((p,i)=>({...p,label:'P'+(i+1)})),links:RIG.model.links.map((l,i)=>({...l,label:'L'+(i+1),points:l.pts.map(p=>RIG.model.points[p].id)})),drivers:RIG.model.drivers,dimensions:RIG.model.dimensions,prisms:RIG.model.prisms,gears:RIG.model.gears,loads:RIG.model.loads,useGravity:RIG.model.useGravity,useInertia:RIG.model.useInertia,useFriction:RIG.model.useFriction},diagnosis:diagnose(),presets:RIG_PRESETS.map((p,i)=>({index:i,name:p.name})),results:U.result&&snapshot()===U.resultSignature&&!$w('wb-export').disabled?summary(U.result):null};}
   function summary(r){return{target:r.targetLabel,range:r.range,time:r.time,duration:r.duration,samples:r.samples,failures:r.failures.slice(0,5),extrema:r.extrema,series:r.series.map(s=>({label:s.label,unit:s.unit,min:s.min,max:s.max,current:r.range==='current'?s.values[0]:undefined}))};}
-  function preview(model,label){U.preview={model:M.ensure(model),signature:snapshot(),label};$w('wb-preview').hidden=false;$w('wb-preview-note').textContent=label+'\n橙色为修改后，灰色为当前模型。';drawPreview();openPanel();$w('wb-preview').scrollIntoView({block:'nearest'});return{status:'awaiting_user_apply',message:'草稿已生成，尚未应用。用户可预览并应用。'};}
+  function preview(model,label){MechJoints.assert(model);U.preview={model:M.ensure(model),signature:snapshot(),label};$w('wb-preview').hidden=false;$w('wb-preview-note').textContent=label+'\n橙色为修改后，灰色为当前模型。';drawPreview();openPanel();if($w('wb-preview').closest('details'))$w('wb-preview').closest('details').open=true;$w('wb-preview').scrollIntoView({block:'nearest'});return{status:'awaiting_user_apply',message:'草稿已生成，尚未应用。用户可预览并应用。'};}
   function drawPreview(){const cv=$w('wb-preview-canvas'),ctx=cv.getContext('2d');cv.width=560;cv.height=280;ctx.clearRect(0,0,560,280);const both=[...RIG.model.points,...U.preview.model.points];if(!both.length)return;const xs=both.map(p=>p.x),ys=both.map(p=>p.y),xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys),scale=Math.min(500/Math.max(40,xmax-xmin),220/Math.max(40,ymax-ymin)),X=x=>280+(x-(xmin+xmax)/2)*scale,Y=y=>140-(y-(ymin+ymax)/2)*scale;
     for(const [m,color]of [[RIG.model,'#536177'],[U.preview.model,'#ffb454']]){ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;for(const l of m.links){ctx.beginPath();l.pts.forEach((p,i)=>{const q=m.points[p];if(i)ctx.lineTo(X(q.x),Y(q.y));else ctx.moveTo(X(q.x),Y(q.y));});ctx.stroke();}m.points.forEach(p=>{ctx.beginPath();ctx.arc(X(p.x),Y(p.y),p.ground?5:3,0,2*Math.PI);ctx.fill();});}}
   bind('wb-preview-apply',()=>{if(!U.preview)return;if(snapshot()!==U.preview.signature){U.preview=null;$w('wb-preview').hidden=true;throw Error('模型已经改变，旧 AI 草稿已取消，请重新提出修改。');}const p=U.preview;U.preview=null;$w('wb-preview').hidden=true;commit(p.model,p.label);bubble('修改已应用：'+p.label,'tool');});
@@ -247,7 +248,7 @@
       case 'preset':{if(!Number.isInteger(a.preset)||!RIG_PRESETS[a.preset])throw Error('机构预设编号无效。');return preview(RIG_PRESETS[a.preset].make(),'载入 '+RIG_PRESETS[a.preset].name+'，将替换当前模型。');}
       case 'length':{if(ids.length!==1)throw Error('修改杆长需要一个构件 ID。');const l=RIG.model.links[M.index(RIG.model,'links',ids[0])];if(l.pts.length!==2)throw Error('首版只支持修改两点杆长度。');return preview(M.dimension(RIG.model,{kind:'distance',points:l.pts.map(i=>RIG.model.points[i].id),mode:'driving',value:a.value}),'将所选杆长设为 '+a.value+' mm。');}
       case 'ground':{if(typeof a.enabled!=='boolean')throw Error('固定状态必须为布尔值。');return preview(M.ground(RIG.model,'points',ids,a.enabled),(a.enabled?'固定':'取消固定')+' '+ids.length+' 个铰点。');}
-      case 'merge':return preview(M.merge(RIG.model,ids),'合并 '+ids.length+' 个铰点，以第一个点为目标。');
+      case 'merge':return preview(MechJoints.merge(RIG.model,ids,M),'合并 '+ids.length+' 个铰点，以第一个点为目标。');
       case 'analyze':{if(ids.length!==1)throw Error('分析需要指定一个对象 ID。');$w('wb-target').value=ids[0];setMetrics();if(!Array.isArray(a.metrics))throw Error('计算项目无效。');for(const cb of $w('wb-metrics').querySelectorAll('input'))cb.checked=a.metrics.includes(cb.value);$w('wb-range').value=a.range==='scan'?'scan':'current';if(a.duration!=null)$w('wb-duration').value=a.duration;const r=calculate({...readRequest(),target:ids[0],metrics:a.metrics});openPanel();return summary(r);}
       default:throw Error('不支持的 AI 操作：'+a.action);
     }
@@ -288,6 +289,6 @@
   // Expose a small reviewable interface for integration tests and future UI controls.
   window.MechWorkbench={state:U,context,runTool,commit,calculate,diagnose,select:(points=[],links=[])=>{U.points=points;U.links=links;syncSelection();rigDraw(rigMain);},undo:()=>restore(U.undo,U.redo),redo:()=>restore(U.redo,U.undo)};
   M.ensure(RIG.model);U.signature=snapshot();changed();refreshTargets();renderDimensions();syncSelection();pause();rigSolve();rigDraw(rigMain);checkAI();
-  message('已启用多选、复合铰链、智能尺寸与按需计算。Ctrl 增选，Shift 拖动框选，D 设置尺寸。');
+  message('已启用多选、智能尺寸与按需计算。多构件共用铰点请使用独立复合铰链工具。Ctrl 增选，Shift 拖动框选，D 设置尺寸。');
   window.addEventListener('resize',drawChart);
 })();

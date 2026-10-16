@@ -1,26 +1,33 @@
-# 机械原理学习台 · GitHub Pages 分享版
+# MECHLAB · 动态机械 CAD 工作台
 
-纯静态机械原理实验室，无需安装依赖或构建。支持智能尺寸、复合铰链、多选固定端、按需计算、曲线与结果导出、手机触摸、模型 JSON 导入导出。
+当前界面采用石墨灰蓝、青蓝与橙色标识，使用动态曲柄滑块示意。动效可关闭，支持系统减少动态效果。示意与实际模型计算独立。设计说明见 机械UI设计.md。
 
-发布配置完成后的地址：https://wqyyh19571055193-creator.github.io/study/
+顶部“操作指南”或 F1 可打开内置说明，含快速上手、构图尺寸、固定端与铰链、滑块导轨、文字建模、运动计算、快捷键及常见问题。章节可折叠，目录可定位，步骤可跳转到对应面板；滑块面板也有直达相关步骤的入口。
 
-## 发布
+## 建模与计算
 
-1. 本项目仓库为 wqyyh19571055193-creator/study。
-2. 将本目录中的网页文件上传到仓库根目录（index.html 必须在根目录，不要再套一层文件夹）。
-3. 仓库 Settings → Pages → Build and deployment，选择 Deploy from a branch，分支 main，目录 / (root)，点击 Save。
-4. 等待 GitHub Pages 构建完成后，复制 Pages 页面显示的网址，即可分享给其他人。
+- CAD 网格、端点捕捉、正交、坐标和极坐标命令。
+- 文字生成四杆、曲柄滑块或逐点逐杆模型；预览后应用，可撤销。
+- 支持固定铰、机架、滑槽和独立复合铰链。普通点最多一个转动副，多构件连接需显式启用。
+- 独立滑块面板：S 展开；H / V 水平、竖直；[ / ] 旋转固定导轨 ±15°；输入角度回车应用。方向快捷键仅在面板展开时生效，支持批量、撤销及手机画布选取。
+- 结果包括中文说明、数值、单位、方向、采样极值与逐时刻数据，可导出 TXT 和 CSV。
 
-官方说明：https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
+文字建模目前采用本地规则，任意自然语言 AI 需要后端；模板质量/惯量默认 0，受力计算前应填写实际参数。使用方法见 CAD使用说明.md 与 复合铰链使用说明.md。
 
-## 使用
+## 更新网页
 
-所有机械建模与计算在浏览器运行。浏览器本地保存不会在用户之间共享；跨设备可下载/打开模型 JSON。复杂机构建议使用电脑或平板横屏。
+将更新包解压后的文件和 assets 文件夹上传到：
+https://github.com/wqyyh19571055193-creator/study/upload/main/study-github-pages
 
-## AI 边界
+不要额外套一层发布包文件夹。提交后等待 Pages 构建结束，在原网址 Ctrl+F5 刷新：
+https://wqyyh19571055193-creator.github.io/study/study-github-pages/
 
-GitHub Pages 不运行服务器代码。本版本明确关闭在线 AI 输入，保留本地机构检查。接入 AI 时需另行部署含身份校验、额度限制的后端，再修改接口地址。不要将模型密钥放入网页、仓库或浏览器。
+## 本地预览与验证
 
-## 本地预览
+直接打开 index.html 即可使用本地建模。开发预览：node tests/serve.mjs，然后打开 http://127.0.0.1:8790/mech-lab/ 。
 
-安装 Node.js 后运行 node tests/serve.mjs，然后打开 http://127.0.0.1:8790/mech-lab/ 。此预览刻意使用子路径，以检查 GitHub 项目站点资源路径。
+浏览器检查：node tests/joints-browser.mjs（需要预览服务和本机 Edge）。本轮 90 项浏览器检查通过，覆盖操作指南导航与跳转、弹窗快捷键隔离、手机阅读、滑块操作，以及原有绘图、文字建模、铰链、计算报告与机械动效。另有 16 项滑槽模型操作检查。
+
+机械与编辑回归：node tests/run-mechanics.mjs。其余：node tests/joints.mjs、node tests/cad.mjs、node tests/supports.mjs。
+
+数据保存在浏览器本地，跨设备请下载/打开 JSON。滑槽为移动副约束，不含端部碰撞。扫描极值来自采样，不是严格数学极值。
